@@ -8,12 +8,12 @@ namespace ConsoleApp
         static void Main(string[] args)
         {
             var random = new RandomG();
-            var ms = new MorozovSet();
             var first = random.GetBitmap();
-            var second = random.GetBitmap();
-            var third = random.GetBitmap();
-            var bmp = ms.GetBitmap();
-            bmp.Save("out.bmp");
+            var second = new Constant().GetBitmap();
+            var s = new MorozovSet();
+            var bmp = s.GetBitmap();
+            bmp = Combinations.Multiply(Combinations.Multiply(first, second), bmp);
+            bmp.Save("output.bmp");
         }
     }
 }

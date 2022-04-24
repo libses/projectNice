@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Domain
 {
-    public class MorozovSet
+    public class Constant
     {
         public Bitmap GetBitmap()
         {
@@ -19,12 +18,7 @@ namespace Domain
             {
                 for (int y = 0; y < ySize; y++)
                 {
-                    var dx = x / 256d;
-                    var dy = y / 256d;
-                    var complex = new Complex(dx, dy);
-                    var t = (2 * complex.Phase / Math.PI).ToInt();
-                    
-                    bmp.SetPixel(x, y, Color.FromArgb(t, t, t));
+                    bmp.SetPixel(x, y, Color.Gray);
                 }
             }
 
