@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Domain
 {
-    public class RandomG
+    public class RandomG : IRenderable
     {
         public Bitmap GetBitmap()
         {

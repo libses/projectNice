@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Domain
 {
-    public class MorozovSet
+    public class Gradient : IRenderable
     {
         public Bitmap GetBitmap()
         {

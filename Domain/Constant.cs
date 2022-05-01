@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Domain
 {
-    public class Constant
+    public class Constant : IRenderable
     {
         public Bitmap GetBitmap()
         {

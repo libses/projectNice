@@ -9,19 +9,12 @@ namespace Domain
 {
     public static class Combinations
     {
-        public static int[] ToBinary(this int f)
+        public static IRenderable Add(this IRenderable f, IRenderable s)
         {
-            var array = new int[8];
-            var s = f;
-            for (int i = 0; i < 8; i++)
-            {
-                array[i] = s % 2;
-                s = s / 2;
-            }
-
-            return array;
+            return new AnonymousRender(f.GetBitmap().Add(s.GetBitmap()));
         }
-        public static Bitmap Add(Bitmap f, Bitmap s)
+
+        public static Bitmap Add(this Bitmap f, Bitmap s)
         {
             var bmp = new Bitmap(f.Width, f.Height);
             for (int x = 0; x < f.Width; x++)
@@ -35,7 +28,12 @@ namespace Domain
             return bmp;
         }
 
-        public static Bitmap Multiply(Bitmap f, Bitmap s)
+        public static IRenderable Multiply(this IRenderable f, IRenderable s)
+        {
+            return new AnonymousRender(f.GetBitmap().Multiply(s.GetBitmap()));
+        }
+
+        public static Bitmap Multiply(this Bitmap f, Bitmap s)
         {
             var bmp = new Bitmap(f.Width, f.Height);
             for (int x = 0; x < f.Width; x++)
