@@ -9,12 +9,12 @@ namespace Domain
 {
     public abstract class Renderable : IRenderable
     {
-        public int x;
-        public int y;
-        public Renderable(int x, int y)
+        public int Width;
+        public int Height;
+        public Renderable(int width, int height)
         {
-            this.x = x;
-            this.y = y;
+            Width = width;
+            Height = height;
         }
 
         public Bitmap GetBitmap()

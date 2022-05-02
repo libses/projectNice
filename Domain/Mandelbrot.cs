@@ -10,38 +10,52 @@ namespace Domain
 {
     public class Mandelbrot : Renderable
     {
-        public Mandelbrot(int x, int y) : base(x, y)
+        private double scale = 1;
+        private double centerX = 0; //[-1, 1]
+        private double centerY = 0;
+
+        public Mandelbrot(int width, int height) : base(width, height)
         {
         }
 
-        public Bitmap GetBitmap()
+        /*public Mandelbrot WithZoom(double scale)
         {
-            var bmp = new Bitmap(x, y);
-            var x2 = (double)(x / 2);
-            var y2 = (double)(y / 2);
-            var x4 = (double)(x / 4);
-            var y4 = (double)(y / 4);
-            for (int xx = 0; xx < x; xx++)
+            this.scale = scale;
+            return this;
+        }
+
+        public Mandelbrot InPosition(int x, int y)
+        {
+            centerX = (x - Width / 2d) / (Width / 2d);
+            centerY = (y - Height / 2d) / (Height / 2d);
+            return this;
+        }*/
+
+        public Bitmap GetBitmap(int x, int y, double scale)
+        {
+            centerX = (x - Width / 2d) / (Width / 2d);
+            centerY = (y - Height / 2d) / (Height / 2d);
+            var bmp = new Bitmap(Width, Height);
+            var x2 = Width / 2d;
+            var y2 = Height / 2d;
+            var x4 = Width / 4d;
+            var y4 = Height / 4d;
+            for (int xx = 0; xx < Width; xx++)
             {
-                for (int yy = 0; yy < y; yy++)
+                for (int yy = 0; yy < Height; yy++)
                 {
-                    var a = (xx - x2) / x4;
-                    var b = (yy - y2) / y4;
+                    var a = (xx - x2) / x4 * (1 / scale) + centerX;
+                    var b = (yy - y2) / y4 * (1 / scale) + centerY;
                     var z = new Complex(0, 0);
                     var c = new Complex(a, b);
                     for (int i = 0; i < 256; i++)
                     {
                         z = z * z + c;
-                        var modulo = z.Imaginary * z.Imaginary + z.Real + z.Real;
-                        if (modulo > 4)
+                        var modulo = z.Magnitude;
+                        if (modulo > 4 || i == 255)
                         {
                             bmp.SetPixel(xx, yy, Color.FromArgb(i, i, i));
                             break;
-                        }
-
-                        if (i == 255)
-                        {
-                            bmp.SetPixel(xx, yy, Color.FromArgb(i, i, i));
                         }
                     }
                 }
