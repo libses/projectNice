@@ -15,7 +15,9 @@ namespace ConsoleApp
     {
         static void Main(string[] args)
         {
-            int Fact(int n)
+            var mb = new Mandelbrot(3000, 3000);
+
+            /*int Fact(int n)
             {
                 var r = 1;
                 for (var i = 1; i < n; i++)
@@ -27,7 +29,6 @@ namespace ConsoleApp
 
             var framesCount = 20;
             var imgs = new Bitmap[framesCount];
-            var mb = new Mandelbrot(1000, 1000);
             var render = Parallel.For(0, framesCount,
                 i =>
                 {
@@ -40,8 +41,8 @@ namespace ConsoleApp
                     {
                         gif.AddFrame(img, delay: 200, quality: GifQuality.Bit8);
                     }
-                }
-        //    mb.GetBitmap(199, 284, 50000).Save("aboba.bmp");
+                }*/
+            mb.GetBitmap(900, 1500, 1.2).Save("aboba.bmp");
         }
     }
 }

@@ -33,7 +33,7 @@ namespace Domain
 
         public Bitmap GetBitmap(int x, int y, double scale)
         {
-            centerX = (x - Width / 2d) / (Width / 2d);
+            centerX = (x - Width / 2d) / (Width / 2d); // [-1, 1]
             centerY = (y - Height / 2d) / (Height / 2d);
             var bmp = new Bitmap(Width, Height);
             var x2 = Width / 2d;
@@ -48,20 +48,64 @@ namespace Domain
                     var b = (yy - y2) / y4 * (1 / scale) + centerY;
                     var z = new Complex(0, 0);
                     var c = new Complex(a, b);
-                    for (int i = 0; i < 256; i++)
+                    var (i, inBounds) = CheckPoint(a, b);
+                    if (inBounds)
+                    {
+                        bmp.SetPixel(xx, yy, Color.White);
+                    }
+                    else if (i > 1)
+                    {
+                        var r = (int)(350 - Math.Sqrt(i) * 200 % 255);
+                        if (r > 255) r = 255;
+                        var color = Color.FromArgb(r, 80, 100);
+                        bmp.SetPixel(xx, yy, color);
+                    }
+                    else
+                    {
+                        bmp.SetPixel(xx, yy, Color.Black);
+                    }
+                    /*for (int i = 0; i < 256; i++)
                     {
                         z = z * z + c;
-                        var modulo = z.Magnitude;
-                        if (modulo > 4 || i == 255)
+                        var modulo = z.Imaginary * z.Imaginary + z.Real * z.Real;
+                        if (modulo > 4)
                         {
-                            bmp.SetPixel(xx, yy, Color.FromArgb(i, i, i));
+                            var r = i;
+                            if (r < 50)
+                                r = r * 5;
+                            bmp.SetPixel(xx, yy, Color.FromArgb(r, 80, 100));
                             break;
                         }
-                    }
+
+                        if (i == 255)
+                        {
+                            bmp.SetPixel(xx, yy, Color.FromArgb(i, i, i));
+                        }
+                    }*/
                 }
             }
 
             return bmp;
+        }
+
+        private (int, bool) CheckPoint(double x, double y)
+        {
+            var z = new Complex(0, 0);
+            var c = new Complex(x, y);
+            var i = 0;
+            var bounds = 2;
+            var inBounds = true;
+            while (i < 50 && inBounds)
+            {
+                z = z * z + c;
+                i++;
+                if (z.Imaginary > bounds)
+                {
+                    inBounds = false;
+                }
+            }
+
+            return (i, inBounds);
         }
     }
 }
