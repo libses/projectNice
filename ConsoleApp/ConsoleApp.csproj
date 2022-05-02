@@ -2,12 +2,15 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <LangVersion>default</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="AnimatedGif" Version="1.0.5" />
+    <PackageReference Include="FFMediaToolkit" Version="4.4.1" />
+    <PackageReference Include="Spectrogram" Version="1.4.4" />
+    <PackageReference Include="Xabe.FFmpeg" Version="5.1.0" />
   </ItemGroup>
 
   <ItemGroup>
