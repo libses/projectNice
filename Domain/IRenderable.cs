@@ -4,6 +4,6 @@ namespace Domain
 {
     public interface IRenderable
     {
-        Bitmap GetBitmap();
+        DirectBitmap GetBitmap();
     }
 }

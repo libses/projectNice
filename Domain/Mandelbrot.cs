@@ -11,8 +11,8 @@ namespace Domain
     public class Mandelbrot : Renderable
     {
         private double scale = 1;
-        private double centerX = 0; //[-1, 1]
-        private double centerY = 0;
+
+        private static int[] cycle = Enumerable.Range(0, 256).Select(x => x).ToArray();
 
         public Mandelbrot(int width, int height) : base(width, height)
         {
@@ -31,57 +31,44 @@ namespace Domain
             return this;
         }*/
 
-        public Bitmap GetBitmap(int x, int y, double scale)
+        public DirectBitmap GetBitmap(double scale, double a, double b)
         {
-            centerX = (x - Width / 2d) / (Width / 2d); // [-1, 1]
-            centerY = (y - Height / 2d) / (Height / 2d);
-            var bmp = new Bitmap(Width, Height);
-            var x2 = Width / 2d;
-            var y2 = Height / 2d;
-            var x4 = Width / 4d;
-            var y4 = Height / 4d;
+            var bmp = new DirectBitmap(Width, Height);
             for (int xx = 0; xx < Width; xx++)
             {
                 for (int yy = 0; yy < Height; yy++)
                 {
-                    var a = (xx - x2) / x4 * (1 / scale) + centerX;
-                    var b = (yy - y2) / y4 * (1 / scale) + centerY;
                     var z = new Complex(0, 0);
-                    var c = new Complex(a, b);
-                    var (i, inBounds) = CheckPoint(a, b);
-                    if (inBounds)
-                    {
-                        bmp.SetPixel(xx, yy, Color.White);
-                    }
-                    else if (i > 1)
-                    {
-                        var r = (int)(350 - Math.Sqrt(i) * 200 % 255);
-                        if (r > 255) r = 255;
-                        var color = Color.FromArgb(r, 80, 100);
-                        bmp.SetPixel(xx, yy, color);
-                    }
-                    else
-                    {
-                        bmp.SetPixel(xx, yy, Color.Black);
-                    }
-                    /*for (int i = 0; i < 256; i++)
+                    var xxW = xx / (double)Width;
+                    var yyW = yy / (double)Height;
+                    var c = new Complex((xxW - 0.5) * scale + a, (yyW - 0.5) * scale + b);
+                    //var (i, inBounds) = CheckPoint(a, b);
+                    //if (inBounds)
+                    //{
+                    //    bmp.SetPixel(xx, yy, Color.White);
+                    //}
+                    //else if (i > 1)
+                    //{
+                    //    var r = (int)(350 - Math.Sqrt(i) * 200 % 255);
+                    //    if (r > 255) r = 255;
+                    //    var color = Color.FromArgb(r, 80, 100);
+                    //    bmp.SetPixel(xx, yy, color);
+                    //}
+                    //else
+                    //{
+                    //    bmp.SetPixel(xx, yy, Color.Black);
+                    //}
+                    foreach (int i in cycle)
                     {
                         z = z * z + c;
                         var modulo = z.Imaginary * z.Imaginary + z.Real * z.Real;
-                        if (modulo > 4)
+                        if (modulo >= 4)
                         {
-                            var r = i;
-                            if (r < 50)
-                                r = r * 5;
-                            bmp.SetPixel(xx, yy, Color.FromArgb(r, 80, 100));
+                            var r = 255 - i;
+                            bmp.SetPixel(xx, yy, Color.FromArgb(r, r, r, r));
                             break;
                         }
-
-                        if (i == 255)
-                        {
-                            bmp.SetPixel(xx, yy, Color.FromArgb(i, i, i));
-                        }
-                    }*/
+                    }
                 }
             }
 

@@ -14,9 +14,9 @@ namespace Domain
             return new AnonymousRender(f.GetBitmap().Add(s.GetBitmap()));
         }
 
-        public static Bitmap Add(this Bitmap f, Bitmap s)
+        public static DirectBitmap Add(this DirectBitmap f, DirectBitmap s)
         {
-            var bmp = new Bitmap(f.Width, f.Height);
+            var bmp = new DirectBitmap(f.Width, f.Height);
             for (int x = 0; x < f.Width; x++)
             {
                 for (int y = 0; y < f.Height; y++)
@@ -33,9 +33,9 @@ namespace Domain
             return new AnonymousRender(f.GetBitmap().Multiply(s.GetBitmap()));
         }
 
-        public static Bitmap Multiply(this Bitmap f, Bitmap s)
+        public static DirectBitmap Multiply(this DirectBitmap f, DirectBitmap s)
         {
-            var bmp = new Bitmap(f.Width, f.Height);
+            var bmp = new DirectBitmap(f.Width, f.Height);
             for (int x = 0; x < f.Width; x++)
             {
                 for (int y = 0; y < f.Height; y++)

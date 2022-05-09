@@ -35,65 +35,97 @@ namespace ConsoleApp
             return (audio.ToArray(), sampleRate);
         }
 
-        static void Main(string[] args)
+        public static DirectBitmap[] DoThings(SpectrogramGenerator sg, int take, int x, int y)
         {
-            //var mb = new Mandelbrot(3000, 3000);
-            (double[] audio, int sampleRate) = ReadWavMono("606.wav");
-            var sg = new SpectrogramGenerator(sampleRate, fftSize: 4096, stepSize: 2000, maxFreq: 3000);
-            sg.Add(audio);
+            var fftBitmap = new FFT(x, y);
             var fft = sg.GetFFTs();
-            var sample = fft.Take(660);
-            var sum = sample.Select(x => x.Sum());
-            var max = sum.Max();
-            var min = sum.Min();
-            var n = new FFT(200, 200);
-            var imgs = sample.Select(x => n.GetBitmap(x, min, max)).ToArray();
-            var settings = new VideoEncoderSettings(width: 200, height: 200, framerate: 44, codec: VideoCodec.H264);
+            var array = new DirectBitmap[take];
+            var min = 10000000000d;
+            var max = 0d;
+            for (int i = 0; i < take; i++)
+            {
+                var sum = 0d;
+                foreach (var e in fft[i])
+                {
+                    sum += e;
+                }
+
+                if (sum < min)
+                {
+                    min = sum;
+                }
+
+                if (sum > max)
+                {
+                    max = sum;
+                }
+
+                if (sum > 0.00001)
+                {
+                    array[i] = fftBitmap.GetBitmap(fft[i], min, max, sum);
+                }
+                else
+                {
+                    array[i] = new DirectBitmap(x, y);
+                }
+            }
+
+            return array;
+        }
+        //H265
+        public static void CreateVideo(DirectBitmap[] imgs, int x, int y, int fps)
+        {
+            var settings = new VideoEncoderSettings(width: x, height: y, framerate: fps, codec: VideoCodec.H265);
             FFmpegLoader.FFmpegPath = @"C:\ff\bin";
             var file = MediaBuilder.CreateContainer(@"C:\videos\example.mp4").WithVideo(settings).Create();
             for (int i = 0; i < imgs.Length; i++)
             {
-                Console.WriteLine(i/(double)imgs.Length);
                 var bitmap = imgs[i];
-                var rect = new Rectangle(Point.Empty, bitmap.Size);
-                var bitLock = bitmap.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
-                var bitmapData = ImageData.FromPointer(bitLock.Scan0, ImagePixelFormat.Bgr24, bitmap.Size);
+                var rect = new Rectangle(Point.Empty, bitmap.Bitmap.Size);
+                var bitLock = bitmap.Bitmap.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+                var bitmapData = ImageData.FromPointer(bitLock.Scan0, ImagePixelFormat.Bgr24, bitmap.Bitmap.Size);
 
                 file.Video.AddFrame(bitmapData); // Encode the frame
 
-                bitmap.UnlockBits(bitLock);
+                bitmap.Bitmap.UnlockBits(bitLock);
             }
 
             file.Dispose();
-            //sg.SaveImage("hal.png");
-            //44.25 fps
+        }
 
-            /*int Fact(int n)
+        public static void GenerateMusicVideo()
+        {
+            (double[] audio, int sampleRate) = ReadWavMono("606.wav");
+            var sg = new SpectrogramGenerator(sampleRate, fftSize: 4096, stepSize: 2000, maxFreq: 3000);
+            sg.Add(audio);
+            var imgs = DoThings(sg, 600, 200, 200);
+            CreateVideo(imgs, 200, 200, 44);
+        }
+        //835 1360
+        static void Main(string[] args)
+        {
+            var mb = new Mandelbrot(1500, 1500);
+
+            mb.GetBitmap(0, 0.311, 0.482).Bitmap.Save("aboba.bmp");
+            var imgs = new List<(double, DirectBitmap)>();
+            var a = new List<double>();
+            for (var i = 0.01d; i < 1; i *= 1.01)
             {
-                var r = 1;
-                for (var i = 1; i < n; i++)
-                {
-                    r *= i;
-                }
-                return r;
+                a.Add(i);
             }
 
-            var framesCount = 20;
-            var imgs = new Bitmap[framesCount];
-            var render = Parallel.For(0, framesCount,
-                i =>
-                {
-                    imgs[i] = mb.GetBitmap(199, 284, 1 + Fact(i)/20d);
-                });
-            if (render.IsCompleted)
-                using (var gif = AnimatedGif.AnimatedGif.Create("output.gif", 20))
-                {
-                    foreach (var img in imgs)
-                    {
-                        gif.AddFrame(img, delay: 200, quality: GifQuality.Bit8);
-                    }
-                }*/
-            //mb.GetBitmap(900, 1500, 1.2).Save("aboba.bmp");
+            Console.Write(a.Count);
+            var d = a.AsParallel();
+            var f = new Gradient().GetBitmap();
+            d.ForAll(i =>
+            {
+                var bmp = mb.GetBitmap(i, 0.311, 0.482).Multiply(f);
+                imgs.Add((i, bmp));
+            });
+
+            Console.WriteLine("video!");
+
+            CreateVideo(imgs.OrderByDescending(x => x.Item1).Select(x => x.Item2).ToArray(), 1500, 1500, 24);
         }
     }
 }

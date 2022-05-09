@@ -9,13 +9,13 @@ namespace Domain
 {
     public class AnonymousRender : IRenderable
     {
-        private Bitmap bitmap;
-        public AnonymousRender(Bitmap source)
+        private DirectBitmap bitmap;
+        public AnonymousRender(DirectBitmap source)
         {
             bitmap = source;
         }
 
-        public Bitmap GetBitmap()
+        public DirectBitmap GetBitmap()
         {
             return bitmap;
         }

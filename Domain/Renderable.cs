@@ -17,7 +17,7 @@ namespace Domain
             Height = height;
         }
 
-        public Bitmap GetBitmap()
+        public DirectBitmap GetBitmap()
         {
             throw new NotImplementedException();
         }
