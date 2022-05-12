@@ -15,6 +15,7 @@ using System.Linq;
 using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
+using Domain.Render;
 
 namespace ConsoleApp
 {
@@ -62,7 +63,9 @@ namespace ConsoleApp
 
                 if (sum > 0.00001)
                 {
-                    array[i] = fftBitmap.GetBitmap(fft[i], min, max, sum);
+                    array[i] = fftBitmap
+                        .Config(new FFTSettings(fft[i], min, max, sum))
+                        .GetBitmap();
                 }
                 else
                 {
@@ -104,9 +107,11 @@ namespace ConsoleApp
         //835 1360
         static void Main(string[] args)
         {
-            var mb = new Mandelbrot(1500, 1500);
-
-            mb.GetBitmap(0, 0.311, 0.482).Bitmap.Save("aboba.bmp");
+            new Mandelbrot(1500, 1500)
+                .Config(new MandelbrotSettings(0, 0.311, 0.482))
+                .GetBitmap()
+                .Bitmap
+                .Save("aboba.bmp");
             var imgs = new List<(double, DirectBitmap)>();
             var a = new List<double>();
             for (var i = 0.01d; i < 1; i *= 1.01)
@@ -116,10 +121,13 @@ namespace ConsoleApp
 
             Console.Write(a.Count);
             var d = a.AsParallel();
-            var f = new Gradient().GetBitmap();
             d.ForAll(i =>
             {
-                var bmp = mb.GetBitmap(i, 0.311, 0.482).Multiply(f);
+                var bmp = ImageBase.Create()
+                    .Config(new ImageSettings(1500, 1500))
+                    .Add<Mandelbrot>(m => m.Config(new MandelbrotSettings(i, 0.311, 0.482)))
+                    .Multiply<Gradient>(g => g)
+                    .GetBitmap();
                 imgs.Add((i, bmp));
             });
 

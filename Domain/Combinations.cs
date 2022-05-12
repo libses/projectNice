@@ -9,11 +9,6 @@ namespace Domain
 {
     public static class Combinations
     {
-        public static IRenderable Add(this IRenderable f, IRenderable s)
-        {
-            return new AnonymousRender(f.GetBitmap().Add(s.GetBitmap()));
-        }
-
         public static DirectBitmap Add(this DirectBitmap f, DirectBitmap s)
         {
             var bmp = new DirectBitmap(f.Width, f.Height);
@@ -26,11 +21,6 @@ namespace Domain
             }
 
             return bmp;
-        }
-
-        public static IRenderable Multiply(this IRenderable f, IRenderable s)
-        {
-            return new AnonymousRender(f.GetBitmap().Multiply(s.GetBitmap()));
         }
 
         public static DirectBitmap Multiply(this DirectBitmap f, DirectBitmap s)
