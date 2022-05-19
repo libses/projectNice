@@ -7,11 +7,19 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <!-- <MediaElement Height="900" -->
-        <!--               LoadedBehavior="Manual" Volume="0" Name="MePlayer" /> -->
-        <Button x:Name="PauseBtn" MinWidth="100" MinHeight= "50" VerticalAlignment="Bottom" HorizontalAlignment="Left">Pause</Button>
-        <Button x:Name="PlayBtn" MinWidth="100" MinHeight= "50" VerticalAlignment="Bottom" HorizontalAlignment="Right">Play</Button>
-        <Image Name="ImageViewer1" Height="Auto" Width="Auto" />         
+        <Grid.RowDefinitions>
+            <RowDefinition Height="90*" />
+            <RowDefinition Height="10*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="30*" />
+            <ColumnDefinition Width="30*" />
+            <ColumnDefinition Width="30*" />
+        </Grid.ColumnDefinitions>
+        <Button x:Name="PlayBtn" MinWidth="100" MinHeight="50" HorizontalAlignment="Stretch" Grid.Row="1" Grid.Column="2">Play</Button>
+        <Button x:Name="PauseBtn" MinWidth="100" MinHeight="50" HorizontalAlignment="Stretch" Grid.Row="1" Grid.Column="0">Pause</Button>
+        <Image Name="ImageViewer1" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"/>
+        <Button Name="btnOpenFile" Grid.Row="1" Grid.Column="1"  Click="btnOpenFile_Click" HorizontalAlignment="Stretch" Height="Auto">Open file</Button>
 
     </Grid>
 </Window>
