@@ -1,9 +1,10 @@
 ﻿using System.Drawing;
 using System.Numerics;
+using Cudafy;
 
 namespace Domain.Render
 {
-    public record MandelbrotSettings(double Scale, double A, double B);
+    public record MandelbrotSettings(float Scale, float A, float B);
 
     public class Mandelbrot : Renderable<Mandelbrot, MandelbrotSettings>
     {
@@ -13,15 +14,21 @@ namespace Domain.Render
         public override DirectBitmap GetBitmap()
         {
             var bmp = new DirectBitmap(Width, Height);
+            return DirectBitmap(bmp);
+        }
+
+        [Cudafy]
+        private DirectBitmap DirectBitmap(DirectBitmap bmp)
+        {
             for (var xx = 0; xx < Width; xx++)
             {
                 for (var yy = 0; yy < Height; yy++)
                 {
-                    var z = new Complex(0, 0);
-                    var xxW = xx / (double) Width;
-                    var yyW = yy / (double) Height;
-                    var c = new Complex((xxW - 0.5) * Settings.Scale + Settings.A,
-                        (yyW - 0.5) * Settings.Scale + Settings.B);
+                    var z = new ComplexF(0, 0);
+                    var xxW = xx / (float) Width;
+                    var yyW = yy / (float) Height;
+                    var c = new ComplexF((xxW - 0.5f) * Settings.Scale + Settings.A,
+                        (yyW - 0.5f) * Settings.Scale + Settings.B);
                     foreach (var i in cycle)
                     {
                         z = z * z + c;

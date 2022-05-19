@@ -108,13 +108,13 @@ namespace ConsoleApp
         static void Main(string[] args)
         {
             new Mandelbrot(1500, 1500)
-                .Config(new MandelbrotSettings(0, 0.311, 0.482))
+                .Config(new MandelbrotSettings(0, 0.311f, 0.482f))
                 .GetBitmap()
                 .Bitmap
                 .Save("aboba.bmp");
-            var imgs = new List<(double, DirectBitmap)>();
-            var a = new List<double>();
-            for (var i = 0.01d; i < 1; i *= 1.01)
+            var imgs = new List<(float, DirectBitmap)>();
+            var a = new List<float>();
+            for (var i = 0.01f; i < 1; i *= 1.01f)
             {
                 a.Add(i);
             }
@@ -125,7 +125,7 @@ namespace ConsoleApp
             {
                 var bmp = ImageBase.Create()
                     .Config(new ImageSettings(1500, 1500))
-                    .Add<Mandelbrot>(m => m.Config(new MandelbrotSettings(i, 0.311, 0.482)))
+                    .Add<Mandelbrot>(m => m.Config(new MandelbrotSettings(i, 0.311f, 0.482f)))
                     .Multiply<Gradient>(g => g)
                     .GetBitmap();
                 imgs.Add((i, bmp));

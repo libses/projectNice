@@ -11,9 +11,9 @@ namespace Domain.Render
             for (var x = 0; x < Width; x++)
             for (var y = 0; y < Height; y++)
             {
-                var dx = x / 256d;
-                var dy = y / 256d;
-                var complex = new Complex(dx, dy);
+                var dx = x / 256f;
+                var dy = y / 256f;
+                var complex = new ComplexF(dx, dy);
                 var t = (2 * complex.Phase / Math.PI).ToInt();
 
                 bmp.SetPixel(x, y, Color.FromArgb(t, t, t));
