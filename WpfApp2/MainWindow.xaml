@@ -7,10 +7,11 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <MediaElement Height="900"
-                      LoadedBehavior="Manual" Volume="0" Name="MePlayer" />
+        <!-- <MediaElement Height="900" -->
+        <!--               LoadedBehavior="Manual" Volume="0" Name="MePlayer" /> -->
         <Button x:Name="PauseBtn" MinWidth="100" MinHeight= "50" VerticalAlignment="Bottom" HorizontalAlignment="Left">Pause</Button>
         <Button x:Name="PlayBtn" MinWidth="100" MinHeight= "50" VerticalAlignment="Bottom" HorizontalAlignment="Right">Play</Button>
+        <Image Name="ImageViewer1" Height="Auto" Width="Auto" />         
 
     </Grid>
 </Window>
