@@ -107,7 +107,39 @@ namespace ConsoleApp
             return (R, G, B);
         }
 
+        public static List<double[]> GenerateMusicVideoFull()
+        {
+            (double[] audio, int sampleRate) = ReadWavMono("606.wav");
+            var sg = new SpectrogramGenerator(sampleRate, fftSize: 4096, stepSize: 2000, maxFreq: 3000);
+            sg.Add(audio);
+            var fft = sg.GetFFTs();
+
+            return fft;
+        }
+
         static void Main(string[] args)
+        {
+            var x = 720;
+            var y = 720;
+            var fft = GenerateMusicVideoFull();
+            var array = GenerateMusicVideo();
+            var db = new DirectBitmap[fft.Count];
+            var funny = new Funny(x, y).Config(new FunnySettings(fft));
+            for (int i = 0; i < fft.Count; i++)
+            {
+                db[i] = funny.GetBitmap();
+                int R = (int)(array.Item1[i] * 255);
+                int G = (int)(array.Item2[i] * 255);
+                int B = (int)(array.Item3[i] * 255);
+                var color = Color.FromArgb(R, G, B);
+                var constant = new Constant(x, y).Config(new ConstantSettings(color));
+                db[i].Multiply(constant.GetBitmap());
+            }
+
+            CreateVideo(db, x, y, 44);
+        }
+
+        public void BadExample_Planets()
         {
             var x = 500;
             var y = 500;
@@ -123,7 +155,9 @@ namespace ConsoleApp
                 planets.speed = (float)speed;
                 var color = Color.FromArgb(R, G, B);
                 var constant = new Constant(x, y).Config(new ConstantSettings(color));
-                db[i] = planets.GetBitmap().Multiply(constant.GetBitmap());
+                var bmp = planets.GetBitmap();
+                bmp.Multiply(constant.GetBitmap());
+                db[i] = bmp;
             }
 
             CreateVideo(db, x, y, 44);
@@ -155,16 +189,17 @@ namespace ConsoleApp
             var consta = new Constant(x, y).Config(new ConstantSettings(Color.Blue));
             d.ForAll(i =>
             {
-                var bmp = ImageBase.Create()
-                    .Config(new ImageSettings(x, y))
-                    .Add<Mandelbrot>(m => m.Config(new MandelbrotSettings(i, 0.311, 0.482)))
-                    .Multiply<Gradient>(g => g)
-                    .GetBitmap().Multiply(consta.GetBitmap());
-                imgs.Add((i, bmp));
+                //not compile
+                //var bmp = ImageBase.Create()
+                //    .Config(new ImageSettings(x, y))
+                //    .Add<Mandelbrot>(m => m.Config(new MandelbrotSettings(i, 0.311, 0.482)))
+                //    .Multiply<Gradient>(g => g)
+                //    .GetBitmap().Multiply(consta.GetBitmap());
+                //imgs.Add((i, bmp));
             });
 
             Console.WriteLine("video!");
-            CreateVideo(imgs.OrderByDescending(x => x.Item1).Select(x => x.Item2.Add(ashes.GetBitmap()).Multiply(windows.GetBitmap())).ToArray(), x, y, 24);
+            //CreateVideo(imgs.OrderByDescending(x => x.Item1).Select(x => x.Item2.Add(ashes.GetBitmap()).Multiply(windows.GetBitmap())).ToArray(), x, y, 24);
         }
     }
 }

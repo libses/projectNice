@@ -31,16 +31,18 @@ public class ImageBase : Configurer<ImageSettings>
         return this;
     }
 
-    public ImageBase Multiply<TRenderable>(Func<TRenderable, TRenderable> renderable)
-    where TRenderable : IRenderable
-    {
-        items.Add(
-            (typeof(TRenderable),
-                (x, y) => x.Multiply(y),
-                renderable)
-        );
-        return this;
-    }
+
+    //plz fix
+    //public ImageBase Multiply<TRenderable>(Func<TRenderable, TRenderable> renderable)
+    //where TRenderable : IRenderable
+    //{
+    //    items.Add(
+    //        (typeof(TRenderable),
+    //            (x, y) => x.Multiply(y),
+    //            renderable)
+    //    );
+    //    return this;
+    //}
 
     public DirectBitmap GetBitmap()
     {
