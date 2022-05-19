@@ -107,33 +107,40 @@ namespace ConsoleApp
         //835 1360
         static void Main(string[] args)
         {
-            new Mandelbrot(1500, 1500)
+            var x = 1024;
+            var y = 1024;
+            var windows = new Planets(x, y)
+                .Config(new PlanetsSettings(12, 300, Brushes.White));
+
+            var ashes = new Planets(x, y)
+                .Config(new PlanetsSettings(30, 6, Brushes.White));
+            new Mandelbrot(x, y)
                 .Config(new MandelbrotSettings(0, 0.311, 0.482))
                 .GetBitmap()
                 .Bitmap
                 .Save("aboba.bmp");
             var imgs = new List<(double, DirectBitmap)>();
             var a = new List<double>();
-            for (var i = 0.01d; i < 1; i *= 1.01)
+            for (var i = 0.01d; i < 1; i *= 1.02)
             {
                 a.Add(i);
             }
 
             Console.Write(a.Count);
             var d = a.AsParallel();
+            var consta = new Constant(x, y).Config(new ConstantSettings(Color.Blue));
             d.ForAll(i =>
             {
                 var bmp = ImageBase.Create()
-                    .Config(new ImageSettings(1500, 1500))
+                    .Config(new ImageSettings(x, y))
                     .Add<Mandelbrot>(m => m.Config(new MandelbrotSettings(i, 0.311, 0.482)))
                     .Multiply<Gradient>(g => g)
-                    .GetBitmap();
+                    .GetBitmap().Multiply(consta.GetBitmap());
                 imgs.Add((i, bmp));
             });
 
             Console.WriteLine("video!");
-
-            CreateVideo(imgs.OrderByDescending(x => x.Item1).Select(x => x.Item2).ToArray(), 1500, 1500, 24);
+            CreateVideo(imgs.OrderByDescending(x => x.Item1).Select(x => x.Item2.Add(ashes.GetBitmap()).Multiply(windows.GetBitmap())).ToArray(), x, y, 24);
         }
     }
 }

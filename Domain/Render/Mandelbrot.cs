@@ -9,7 +9,6 @@ namespace Domain.Render
     {
         private static int[] cycle = Enumerable.Range(0, 256).Select(x => x).ToArray();
 
-
         public override DirectBitmap GetBitmap()
         {
             var bmp = new DirectBitmap(Width, Height);
