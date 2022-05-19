@@ -36,19 +36,17 @@ namespace ConsoleApp
             return (audio.ToArray(), sampleRate);
         }
 
-        public static DirectBitmap[] DoThings(SpectrogramGenerator sg, int take, int x, int y)
+        public static double[] DoThings(List<double[]> fft, int x, int y, int down, int up)
         {
-            var fftBitmap = new FFT(x, y);
-            var fft = sg.GetFFTs();
-            var array = new DirectBitmap[take];
-            var min = 10000000000d;
-            var max = 0d;
-            for (int i = 0; i < take; i++)
+            var array = new double[fft.Count];
+            var min = 10000000000d; //1562
+            var max = 0d; //26263
+            for (int i = 0; i < fft.Count; i++)
             {
                 var sum = 0d;
-                foreach (var e in fft[i])
+                for (int j = down; j < up; j++)
                 {
-                    sum += e;
+                    sum += fft[i][j];
                 }
 
                 if (sum < min)
@@ -60,17 +58,17 @@ namespace ConsoleApp
                 {
                     max = sum;
                 }
+            }
 
-                if (sum > 0.00001)
+            for (int i = 0; i < fft.Count; i++)
+            {
+                var sum = 0d;
+                for (int j = down; j < up; j++)
                 {
-                    array[i] = fftBitmap
-                        .Config(new FFTSettings(fft[i], min, max, sum))
-                        .GetBitmap();
+                    sum += fft[i][j];
                 }
-                else
-                {
-                    array[i] = new DirectBitmap(x, y);
-                }
+
+                array[i] = (sum - min) / max;
             }
 
             return array;
@@ -96,24 +94,50 @@ namespace ConsoleApp
             file.Dispose();
         }
 
-        public static void GenerateMusicVideo()
+        public static (double[], double[], double[]) GenerateMusicVideo()
         {
             (double[] audio, int sampleRate) = ReadWavMono("606.wav");
             var sg = new SpectrogramGenerator(sampleRate, fftSize: 4096, stepSize: 2000, maxFreq: 3000);
             sg.Add(audio);
-            var imgs = DoThings(sg, 600, 200, 200);
-            CreateVideo(imgs, 200, 200, 44);
+            var fft = sg.GetFFTs();
+            var discrete = fft[0].Length / 3;
+            var R = DoThings(fft, 200, 200, 0, discrete);
+            var G = DoThings(fft, 200, 200, discrete, 2 * discrete);
+            var B = DoThings(fft, 200, 200, 2 * discrete, 3 * discrete);
+            return (R, G, B);
         }
-        //835 1360
+
         static void Main(string[] args)
+        {
+            var x = 500;
+            var y = 500;
+            var array = GenerateMusicVideo();
+            var planets = new Planets(x, y).Config(new PlanetsSettings(10, 10, 60, Brushes.White));
+            var db = new DirectBitmap[array.Item1.Length];
+            for (int i = 0; i < array.Item1.Length; i++)
+            {
+                var speed = array.Item1[i] + array.Item2[i] + array.Item3[i];
+                int R = (int)(array.Item1[i] * 255);
+                int G = (int)(array.Item2[i] * 255);
+                int B = (int)(array.Item3[i] * 255);
+                planets.speed = (float)speed;
+                var color = Color.FromArgb(R, G, B);
+                var constant = new Constant(x, y).Config(new ConstantSettings(color));
+                db[i] = planets.GetBitmap().Multiply(constant.GetBitmap());
+            }
+
+            CreateVideo(db, x, y, 44);
+        }
+
+        public void BadExample_TryFixThatShit()
         {
             var x = 1024;
             var y = 1024;
             var windows = new Planets(x, y)
-                .Config(new PlanetsSettings(12, 300, Brushes.White));
+                .Config(new PlanetsSettings(12, 300, 300, Brushes.White));
 
             var ashes = new Planets(x, y)
-                .Config(new PlanetsSettings(30, 6, Brushes.White));
+                .Config(new PlanetsSettings(30, 6, 6, Brushes.White));
             new Mandelbrot(x, y)
                 .Config(new MandelbrotSettings(0, 0.311, 0.482))
                 .GetBitmap()
