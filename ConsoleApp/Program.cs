@@ -96,7 +96,7 @@ namespace ConsoleApp
 
         public static (double[], double[], double[]) GenerateMusicVideo()
         {
-            (double[] audio, int sampleRate) = ReadWavMono("606.wav");
+            (double[] audio, int sampleRate) = ReadWavMono("808.wav");
             var sg = new SpectrogramGenerator(sampleRate, fftSize: 4096, stepSize: 2000, maxFreq: 3000);
             sg.Add(audio);
             var fft = sg.GetFFTs();
@@ -109,7 +109,7 @@ namespace ConsoleApp
 
         public static List<double[]> GenerateMusicVideoFull()
         {
-            (double[] audio, int sampleRate) = ReadWavMono("606.wav");
+            (double[] audio, int sampleRate) = ReadWavMono("808.wav");
             var sg = new SpectrogramGenerator(sampleRate, fftSize: 4096, stepSize: 2000, maxFreq: 3000);
             sg.Add(audio);
             var fft = sg.GetFFTs();
@@ -124,16 +124,20 @@ namespace ConsoleApp
             var fft = GenerateMusicVideoFull();
             var array = GenerateMusicVideo();
             var db = new DirectBitmap[fft.Count];
-            var funny = new Funny(x, y).Config(new FunnySettings(fft));
+            var funny = new ThreeD(x, y).Config(new ThreeDSettings(fft));
             for (int i = 0; i < fft.Count; i++)
             {
                 db[i] = funny.GetBitmap();
-                int R = (int)(array.Item1[i] * 255);
-                int G = (int)(array.Item2[i] * 255);
-                int B = (int)(array.Item3[i] * 255);
-                var color = Color.FromArgb(R, G, B);
+                int R = (int)(array.Item1[i] * 255) / 3;
+                int G = (int)(array.Item2[i] * 255) / 4;
+                int B = (int)(array.Item3[i] * 255) / 5;
+                var color = Color.FromArgb(R + 120, G + 120, B + 200);
                 var constant = new Constant(x, y).Config(new ConstantSettings(color));
                 db[i].Multiply(constant.GetBitmap());
+                if (i % 10 == 0)
+                {
+                    Console.WriteLine((double)i / fft.Count);
+                }
             }
 
             CreateVideo(db, x, y, 44);

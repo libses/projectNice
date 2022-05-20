@@ -8,14 +8,6 @@ namespace Domain.Render
     {
         bool isGenerated = false;
         int i = 0;
-        Vector2 UR;
-        Vector2 UL;
-        Vector2 DL;
-        Vector2 DR;
-        (double, double) URMinMax;
-        (double, double) ULMinMax;
-        (double, double) DLMinMax;
-        (double, double) DRMinMax;
         (double, double)[] minMaxes;
 
         public Funny(int width, int height) : base(width, height)
@@ -76,8 +68,6 @@ namespace Domain.Render
             {
                 g.DrawLine(new Pen(Color.White, 6), v.X, v.Y, Width / 2, Height / 2);
             }
-
-            
 
             i++;
             return bmp;
