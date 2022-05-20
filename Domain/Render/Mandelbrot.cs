@@ -33,7 +33,7 @@ namespace Domain.Render
         //     var bmp = new DirectBitmap(Width, Height);
         //     var sw = new Stopwatch();
         //     sw.Start();
-        //     for (var xx = 0; xx < Width; xx++)
+        //     Parallel.For(0, Width, xx =>
         //     {
         //         for (var yy = 0; yy < Height; yy++)
         //         {
@@ -52,7 +52,8 @@ namespace Domain.Render
         //                 break;
         //             }
         //         }
-        //     }
+        //     });
+        //     
         //     sw.Stop();
         //     Console.WriteLine($"Rendering from CPU\n{sw.Elapsed}");
         //     return bmp;

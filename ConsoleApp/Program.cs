@@ -121,8 +121,8 @@ namespace ConsoleApp
 
         static void Main(string[] args)
         {
-            var x = 720;
-            var y = 720;
+            var x = 10_000;
+            var y = 10_000;
             new Mandelbrot(x, y)
                 .Config(new MandelbrotSettings(0, 0.311, 0.482, x, y))
                 .GetBitmap()

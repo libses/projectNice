@@ -70,12 +70,11 @@ namespace Domain.Render
                                                + "\n For use CPU you need override GetBimap method");
 
             var sw = new Stopwatch();
-            var data = new Pixel[Width, Height];
+            
             sw.Start();
             using var buffer = Gpu!.Allocate2DDenseX<Pixel>(new Index2D(Width, Height));
-            buffer.CopyFromCPU(data);
             Kernel!(buffer.IntExtent, Settings, buffer.View);
-            Gpu.Synchronize();
+                //Gpu.Synchronize();
             sw.Stop();
             Console.WriteLine($"Rendering from {Gpu?.Name}");
             Console.WriteLine("-----> " + sw.Elapsed);
