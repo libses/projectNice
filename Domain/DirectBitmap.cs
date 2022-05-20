@@ -1,6 +1,8 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using Domain.Render;
+using ILGPU;
 
 namespace Domain;
 
@@ -46,6 +48,23 @@ public class DirectBitmap : IDisposable
         Disposed = true;
         Bitmap.Dispose();
         BitsHandle.Free();
+    }
+
+    public static DirectBitmap FromPixelArray(Pixel[,] pixels)
+    {
+        var w = pixels.GetLength(0);
+        var h = pixels.GetLength(1);
+        var result = new DirectBitmap(w,h);
+        
+        Parallel.For(0, w, x =>
+        {
+            for (var y = 0; y < h; y++)
+            {
+                result.SetPixel(x,y,pixels[x,y]);
+            }  
+        });
+        
+        return result;
     }
 }
 

@@ -16,6 +16,7 @@ using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Render;
+using Domain.Settings;
 
 namespace ConsoleApp
 {
@@ -26,7 +27,7 @@ namespace ConsoleApp
             using var afr = new AudioFileReader(filePath);
             int sampleRate = afr.WaveFormat.SampleRate;
             int bytesPerSample = afr.WaveFormat.BitsPerSample / 8;
-            int sampleCount = (int)(afr.Length / bytesPerSample);
+            int sampleCount = (int) (afr.Length / bytesPerSample);
             int channelCount = afr.WaveFormat.Channels;
             var audio = new List<double>(sampleCount);
             var buffer = new float[sampleRate * channelCount];
@@ -73,6 +74,7 @@ namespace ConsoleApp
 
             return array;
         }
+
         //H265
         public static void CreateVideo(DirectBitmap[] imgs, int x, int y, int fps)
         {
@@ -121,26 +123,11 @@ namespace ConsoleApp
         {
             var x = 720;
             var y = 720;
-            var fft = GenerateMusicVideoFull();
-            var array = GenerateMusicVideo();
-            var db = new DirectBitmap[fft.Count];
-            var funny = new ThreeD(x, y).Config(new ThreeDSettings(fft));
-            for (int i = 0; i < fft.Count; i++)
-            {
-                db[i] = funny.GetBitmap();
-                int R = (int)(array.Item1[i] * 255) / 3;
-                int G = (int)(array.Item2[i] * 255) / 4;
-                int B = (int)(array.Item3[i] * 255) / 5;
-                var color = Color.FromArgb(R + 120, G + 120, B + 200);
-                var constant = new Constant(x, y).Config(new ConstantSettings(color));
-                db[i].Multiply(constant.GetBitmap());
-                if (i % 10 == 0)
-                {
-                    Console.WriteLine((double)i / fft.Count);
-                }
-            }
-
-            CreateVideo(db, x, y, 44);
+            new Mandelbrot(x, y)
+                .Config(new MandelbrotSettings(0, 0.311, 0.482, x, y))
+                .GetBitmap()
+                .Bitmap
+                .Save("aboba.bmp");
         }
 
         public void BadExample_Planets()
@@ -153,10 +140,10 @@ namespace ConsoleApp
             for (int i = 0; i < array.Item1.Length; i++)
             {
                 var speed = array.Item1[i] + array.Item2[i] + array.Item3[i];
-                int R = (int)(array.Item1[i] * 255);
-                int G = (int)(array.Item2[i] * 255);
-                int B = (int)(array.Item3[i] * 255);
-                planets.speed = (float)speed;
+                int R = (int) (array.Item1[i] * 255);
+                int G = (int) (array.Item2[i] * 255);
+                int B = (int) (array.Item3[i] * 255);
+                planets.speed = (float) speed;
                 var color = Color.FromArgb(R, G, B);
                 var constant = new Constant(x, y).Config(new ConstantSettings(color));
                 var bmp = planets.GetBitmap();
@@ -171,13 +158,13 @@ namespace ConsoleApp
         {
             var x = 1024;
             var y = 1024;
-            var windows = new Planets(x, y)
-                .Config(new PlanetsSettings(12, 300, 300, Brushes.White));
-
-            var ashes = new Planets(x, y)
-                .Config(new PlanetsSettings(30, 6, 6, Brushes.White));
+            // var windows = new Planets(x, y)
+            //     .Config(new PlanetsSettings(12, 300, 300, Brushes.White));
+            //
+            // var ashes = new Planets(x, y)
+            //     .Config(new PlanetsSettings(30, 6, 6, Brushes.White));
             new Mandelbrot(x, y)
-                .Config(new MandelbrotSettings(0, 0.311, 0.482))
+                .Config(new MandelbrotSettings(0, 0.311, 0.482, x, y))
                 .GetBitmap()
                 .Bitmap
                 .Save("aboba.bmp");
@@ -193,13 +180,13 @@ namespace ConsoleApp
             var consta = new Constant(x, y).Config(new ConstantSettings(Color.Blue));
             d.ForAll(i =>
             {
-                //not compile
-                //var bmp = ImageBase.Create()
-                //    .Config(new ImageSettings(x, y))
-                //    .Add<Mandelbrot>(m => m.Config(new MandelbrotSettings(i, 0.311, 0.482)))
-                //    .Multiply<Gradient>(g => g)
-                //    .GetBitmap().Multiply(consta.GetBitmap());
-                //imgs.Add((i, bmp));
+                // not compile
+                // var bmp = ImageBase.Create()
+                //     .Config(new ImageSettings(x, y))
+                //     .Add<Mandelbrot>(m => m.Config(new MandelbrotSettings(i, 0.311, 0.482)))
+                //     .Multiply<Gradient>(g => g)
+                //     .GetBitmap().Multiply(consta.GetBitmap());
+                // imgs.Add((i, bmp));
             });
 
             Console.WriteLine("video!");

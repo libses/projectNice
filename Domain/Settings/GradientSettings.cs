@@ -1,3 +1,3 @@
-namespace Domain;
+namespace Domain.Settings;
 
-public record GradientSettings;
+public struct GradientSettings{}

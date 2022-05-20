@@ -1,5 +1,19 @@
 using System.Drawing;
+using Domain.Render;
 
-namespace Domain;
+namespace Domain.Settings;
 
-public record ConstantSettings(Color Color);
+public readonly struct ConstantSettings
+{
+    public readonly Pixel Color;
+
+    public ConstantSettings(Pixel color)
+    {
+        Color = color;
+    }
+
+    public ConstantSettings(Color color)
+    {
+        Color = new Pixel(color);
+    }
+}

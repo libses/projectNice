@@ -1,3 +1,13 @@
 namespace Domain;
 
-public record ImageSettings(int Width, int Height);
+public readonly struct ImageSettings
+{
+    public ImageSettings(int width, int height)
+    {
+        Width = width;
+        Height = height;
+    }
+
+    public readonly int Width;
+    public readonly int Height;
+}

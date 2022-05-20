@@ -3,7 +3,15 @@ using System.Numerics;
 
 namespace Domain.Render
 {
-    public record FunnySettings(List<double[]> fft);
+    public struct FunnySettings
+    {
+        public readonly IReadOnlyList<double[]> Fft;
+
+        public FunnySettings(List<double[]> fft)
+        {
+            Fft = fft;
+        }
+    }
     public class Funny : Renderable<Funny, FunnySettings>
     {
         bool isGenerated = false;
@@ -16,14 +24,14 @@ namespace Domain.Render
 
         public override DirectBitmap GetBitmap()
         {
-            var n = Settings.fft[0].Length;
-            var discrete = Settings.fft[0].Length / n;
+            var n = Settings.Fft[0].Length;
+            var discrete = Settings.Fft[0].Length / n;
             if (!isGenerated)
             {
                 minMaxes = new (double, double)[n];
                 for (int j = 0; j < n; j++)
                 {
-                    minMaxes[j] = FindMinMaxOnFft(Settings.fft, j * discrete, (j + 1) * discrete);
+                    minMaxes[j] = FindMinMaxOnFft(Settings.Fft, j * discrete, (j + 1) * discrete);
                 }
 
                 isGenerated = true;
@@ -33,7 +41,7 @@ namespace Domain.Render
             var freqs = new (int, double)[n];
             for (int j = 0; j < n; j++)
             {
-                freqs[j] = FindMaxAndFreq(Settings.fft[i], j * discrete, (j + 1) * discrete);
+                freqs[j] = FindMaxAndFreq(Settings.Fft[i], j * discrete, (j + 1) * discrete);
             }
 
             var angles = new double[n];
@@ -89,7 +97,7 @@ namespace Domain.Render
             return (maxI, max);
         }
 
-        private (double, double) FindMinMaxOnFft(List<double[]> fft, int down, int up)
+        private (double, double) FindMinMaxOnFft(IEnumerable<double[]> fft, int down, int up)
         {
             var max = -1d;
             var min = 10000000000000000d;

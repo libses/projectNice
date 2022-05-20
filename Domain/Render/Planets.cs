@@ -8,7 +8,22 @@ using System.Threading.Tasks;
 
 namespace Domain.Render
 {
-    public record PlanetsSettings(int count, int minSize, int maxSize, Brush color);
+    public readonly struct PlanetsSettings
+    {
+        public readonly int Count;
+        public readonly int MinSize;
+        public readonly int MaxSize;
+        public readonly Brush Color;
+
+        public PlanetsSettings(int count, int minSize, int maxSize, Brush color)
+        {
+            Count = count;
+            MinSize = minSize;
+            MaxSize = maxSize;
+            Color = color;
+        }
+    }
+
     public class Planets : Renderable<Planets, PlanetsSettings>
     {
         public List<Planet> PlanetsList = new();
@@ -16,6 +31,7 @@ namespace Domain.Render
         float xMass;
         float yMass;
         public float speed;
+
         public Planets(int width, int height) : base(width, height)
         {
         }
@@ -27,11 +43,11 @@ namespace Domain.Render
             {
                 var r = new Random();
                 PlanetsList = Enumerable
-                    .Range(0, Settings.count - 1)
+                    .Range(0, Settings.Count - 1)
                     .Select(x => new Planet(
                         r.Next(0, Width),
                         r.Next(0, Height),
-                        r.Next(Settings.minSize, Settings.maxSize),
+                        r.Next(Settings.MinSize, Settings.MaxSize),
                         0, 0))
                     .ToList();
 
@@ -43,15 +59,17 @@ namespace Domain.Render
                 var xMassD = PlanetsList.Sum(x => x.Position.X * x.size) / sumMass - xMass;
                 var yMassD = PlanetsList.Sum(y => y.Position.Y * y.size) / sumMass - yMass;
 
-                PlanetsList = PlanetsList.Select(x => new Planet(x.Position.X - xMassD, x.Position.Y - yMassD, x.size, x.Speed.X, x.Speed.Y)).ToList();
-                PlanetsList.Add(new Planet(xMass, yMass, Settings.maxSize, 0, 0));
+                PlanetsList = PlanetsList.Select(x =>
+                    new Planet(x.Position.X - xMassD, x.Position.Y - yMassD, x.size, x.Speed.X, x.Speed.Y)).ToList();
+                PlanetsList.Add(new Planet(xMass, yMass, Settings.MaxSize, 0, 0));
             }
-            
+
             ApplyGravity();
             var g = Graphics.FromImage(bmp.Bitmap);
             foreach (var planet in PlanetsList)
             {
-                g.FillEllipse(Settings.color, planet.Position.X - planet.size / 2, planet.Position.Y - planet.size / 2, planet.size, planet.size);
+                g.FillEllipse(Settings.Color, planet.Position.X - planet.size / 2, planet.Position.Y - planet.size / 2,
+                    planet.size, planet.size);
             }
 
             return bmp;

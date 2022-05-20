@@ -3,7 +3,15 @@ using System.Numerics;
 
 namespace Domain.Render
 {
-    public record ThreeDSettings(List<double[]> FFT);
+    public struct ThreeDSettings
+    {
+        public readonly IReadOnlyList<double[]> FFT;
+
+        public ThreeDSettings(List<double[]> fft)
+        {
+            FFT = fft;
+        }
+    }
     public class ThreeD : Renderable<ThreeD, ThreeDSettings>
     {
         private int i = 0;
@@ -65,7 +73,7 @@ namespace Domain.Render
             return bmp;
         }
 
-        private (double, double) FindMinMaxOnFft(List<double[]> fft, int down, int up)
+        private (double, double) FindMinMaxOnFft(IEnumerable<double[]> fft, int down, int up)
         {
             var max = -1d;
             var min = 10000000000000000d;

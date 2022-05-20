@@ -1,4 +1,7 @@
 ﻿using System.Drawing;
+using Domain.Settings;
+using ILGPU;
+using ILGPU.Runtime;
 
 namespace Domain.Render
 {
@@ -12,8 +15,13 @@ namespace Domain.Render
             return bmp;
         }
 
-        public Constant(int width, int height) : base(width, height)
+        public Constant(int width, int height) : base(width, height,Apply)
         {
+        }
+
+        private static void Apply(Index2D arg1, ConstantSettings arg2, ArrayView2D<Pixel, Stride2D.DenseX> arg3)
+        {
+            throw new NotImplementedException();
         }
     }
 }
