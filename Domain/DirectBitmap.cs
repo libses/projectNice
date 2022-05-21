@@ -1,8 +1,8 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
-using Domain.Render;
-using ILGPU;
+
+#pragma warning disable CS8618
 
 namespace Domain;
 
@@ -11,8 +11,9 @@ public class DirectBitmap : IDisposable
     public Bitmap Bitmap { get; private set; }
 
     private Int32[] data;
-    
-    public Int32[] Data {
+
+    public Int32[] Data
+    {
         get => data;
         set
         {
@@ -21,6 +22,7 @@ public class DirectBitmap : IDisposable
             Bitmap = new Bitmap(Width, Height, Width * 4, PixelFormat.Format32bppRgb, BitsHandle.AddrOfPinnedObject());
         }
     }
+
     public bool Disposed { get; private set; }
     public int Height { get; private set; }
     public int Width { get; private set; }
@@ -32,8 +34,6 @@ public class DirectBitmap : IDisposable
         Width = width;
         Height = height;
         Data = new Int32[width * height];
-        //BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
-        //Bitmap = new Bitmap(width, height, width * 4, PixelFormat.Format32bppPArgb, BitsHandle.AddrOfPinnedObject());
     }
 
     public DirectBitmap(int[] array, int width, int height)
@@ -67,31 +67,4 @@ public class DirectBitmap : IDisposable
         Bitmap.Dispose();
         BitsHandle.Free();
     }
-
-    //public static DirectBitmap FromPixelArray(int[] pixels)
-    //{
-    //    var w = pixels.GetLength(0);
-    //    var h = pixels.GetLength(1);
-    //    var result = new DirectBitmap(w,h);
-
-    //    for (int x = 0; x < w; x++)
-    //    {
-    //        for (int y = 0; y < h; y++)
-    //        {
-    //            result.Bits
-    //        }
-    //    }
-        
-    //    Parallel.For(0, w, x =>
-    //    {
-    //        for (var y = 0; y < h; y++)
-    //        {
-    //            result.SetPixel(x,y,pixels[x,y]);
-    //        }  
-    //    });
-        
-    //    return result;
-    //}
 }
-
-
