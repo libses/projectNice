@@ -65,7 +65,7 @@ namespace Domain.Render
 
         private static void ComputeFromGpu(Index1D index,
             MandelbrotSettings settings,
-            ArrayView1D<byte, Stride1D.Dense> buffer)
+            ArrayView1D<Int32, Stride1D.Dense> buffer)
         {
             var z = new Complex(0, 0);
             var xxW = (index.X % settings.Width) / (double) settings.Width;
@@ -74,11 +74,16 @@ namespace Domain.Render
                 (yyW - 0.5) * settings.Scale + settings.B);
             for (int i = 1; i < 256; i++)
             {
+                if (i == 255)
+                {
+                    buffer[index] = 0;
+                }
+
                 z = z * z + c;
                 var modulo = z.Imaginary * z.Imaginary + z.Real * z.Real;
                 if (!(modulo >= 4)) continue;
                 var r = 255 - i;
-                buffer[index] = (byte)r;
+                buffer[index] = r * 256 * 256 * 256 + r * 256 * 256 + r * 256 + r;
                 break;
             }
         }

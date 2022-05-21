@@ -96,6 +96,33 @@ namespace ConsoleApp
             file.Dispose();
         }
 
+        public static void CreateVideoYield(IEnumerable<Bitmap> imgs, int x, int y, int fps)
+        {
+            var settings = new VideoEncoderSettings(width: x, height: y, framerate: fps, codec: VideoCodec.H265);
+            FFmpegLoader.FFmpegPath = @"C:\ff\bin";
+            var file = MediaBuilder.CreateContainer(@"C:\videos\example.mp4").WithVideo(settings).Create();
+            foreach (var bitmap in imgs)
+            {
+                var rect = new Rectangle(Point.Empty, bitmap.Size);
+                var bitLock = bitmap.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+                var bitmapData = ImageData.FromPointer(bitLock.Scan0, ImagePixelFormat.Bgr24, bitmap.Size);
+
+                file.Video.AddFrame(bitmapData); // Encode the frame
+
+                bitmap.UnlockBits(bitLock);
+            }
+
+            file.Dispose();
+        }
+
+        public static IEnumerable<Bitmap> PhotoYielder(int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                yield return (Bitmap)Bitmap.FromFile("temp\\" + i + ".jpg");
+            }
+        }
+
         public static (double[], double[], double[]) GenerateMusicVideo()
         {
             (double[] audio, int sampleRate) = ReadWavMono("808.wav");
@@ -121,13 +148,22 @@ namespace ConsoleApp
 
         static void Main(string[] args)
         {
-            var x = 16384;
-            var y = 16384;
-            new Mandelbrot(x, y)
-                .Config(new MandelbrotSettings(1, 0.311, 0.482, x, y))
-                .GetBitmap()
-                .Bitmap
-                .Save("aboba.bmp");
+            var x = 1280;
+            var y = 720;
+            var mandel = new Mandelbrot(x, y);
+            var counter = 0;
+            for (double i = 1d; i > 0.0001d; i *= 0.99)
+            {
+                mandel
+                    .Config(new MandelbrotSettings(i, -0.74529, 0.113075, x, y))
+                    .GetBitmap()
+                    .Bitmap
+                    .SaveJPG100(String.Format("temp\\{0}.jpg", counter));
+
+                counter++;
+            }
+
+            CreateVideoYield(PhotoYielder(counter), 1280, 720, 44);
         }
 
         //public void BadExample_Planets()
@@ -192,5 +228,37 @@ namespace ConsoleApp
         //    Console.WriteLine("video!");
         //    //CreateVideo(imgs.OrderByDescending(x => x.Item1).Select(x => x.Item2.Add(ashes.GetBitmap()).Multiply(windows.GetBitmap())).ToArray(), x, y, 24);
         //}
+    }
+
+    public static class BitmapExtensions
+    {
+        public static void SaveJPG100(this Bitmap bmp, string filename)
+        {
+            EncoderParameters encoderParameters = new EncoderParameters(1);
+            encoderParameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 100L);
+            bmp.Save(filename, GetEncoder(ImageFormat.Jpeg), encoderParameters);
+        }
+
+        public static void SaveJPG100(this Bitmap bmp, Stream stream)
+        {
+            EncoderParameters encoderParameters = new EncoderParameters(1);
+            encoderParameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 100L);
+            bmp.Save(stream, GetEncoder(ImageFormat.Jpeg), encoderParameters);
+        }
+
+        public static ImageCodecInfo GetEncoder(ImageFormat format)
+        {
+            ImageCodecInfo[] codecs = ImageCodecInfo.GetImageDecoders();
+
+            foreach (ImageCodecInfo codec in codecs)
+            {
+                if (codec.FormatID == format.Guid)
+                {
+                    return codec;
+                }
+            }
+
+            return null;
+        }
     }
 }

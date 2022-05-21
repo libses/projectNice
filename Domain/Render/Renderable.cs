@@ -19,7 +19,7 @@ namespace Domain.Render
 
         protected readonly Context? GpuContext;
 
-        protected readonly Action<Index1D, TSettings, ArrayView1D<byte, Stride1D.Dense>>? Kernel;
+        protected readonly Action<Index1D, TSettings, ArrayView1D<Int32, Stride1D.Dense>>? Kernel;
 
 
         public void Dispose()
@@ -29,7 +29,7 @@ namespace Domain.Render
         }
 
         protected Renderable(int width, int height,
-            Action<Index1D, TSettings, ArrayView1D<byte, Stride1D.Dense>> action)
+            Action<Index1D, TSettings, ArrayView1D<Int32, Stride1D.Dense>> action)
         {
             if (!action.Method.IsStatic)
             {
@@ -68,17 +68,10 @@ namespace Domain.Render
             if (!IsGpuRenderable)
                 throw new ApplicationException($"{GetType().Name} cannot be used on GPU"
                                                + "\n For use CPU you need override GetBimap method");
-
-            var sw = new Stopwatch();
-            
-            sw.Start();
             var bmp = new DirectBitmap(Width, Height);
-            using var buffer = Gpu!.Allocate1D<byte>(Width * Height);
+            using var buffer = Gpu!.Allocate1D<Int32>(Width * Height);
             Kernel!(buffer.IntExtent, Settings, buffer.View);
                 //Gpu.Synchronize();
-            sw.Stop();
-            Console.WriteLine($"Rendering from {Gpu?.Name}");
-            Console.WriteLine("-----> " + sw.Elapsed);
             bmp.Bits = buffer.GetAsArray1D();
             return bmp;
         }

@@ -10,9 +10,9 @@ public class DirectBitmap : IDisposable
 {
     public Bitmap Bitmap { get; private set; }
 
-    private byte[] bits;
+    private Int32[] bits;
     
-    public byte[] Bits {
+    public Int32[] Bits {
         get
         {
             return bits;
@@ -21,7 +21,7 @@ public class DirectBitmap : IDisposable
         {
             bits = value;
             BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
-            Bitmap = new Bitmap(Width, Height, Width, PixelFormat.Format8bppIndexed, BitsHandle.AddrOfPinnedObject());
+            Bitmap = new Bitmap(Width, Height, Width * 4, PixelFormat.Format32bppRgb, BitsHandle.AddrOfPinnedObject());
         }
     }
     public bool Disposed { get; private set; }
@@ -34,7 +34,7 @@ public class DirectBitmap : IDisposable
     {
         Width = width;
         Height = height;
-        Bits = new byte[width * height];
+        Bits = new Int32[width * height];
         //BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
         //Bitmap = new Bitmap(width, height, width * 4, PixelFormat.Format32bppPArgb, BitsHandle.AddrOfPinnedObject());
     }
