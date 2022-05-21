@@ -9,7 +9,21 @@ namespace Domain;
 public class DirectBitmap : IDisposable
 {
     public Bitmap Bitmap { get; private set; }
-    public Int32[] Bits { get; private set; }
+
+    private byte[] bits;
+    
+    public byte[] Bits {
+        get
+        {
+            return bits;
+        } 
+        set
+        {
+            bits = value;
+            BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
+            Bitmap = new Bitmap(Width, Height, Width, PixelFormat.Format8bppIndexed, BitsHandle.AddrOfPinnedObject());
+        }
+    }
     public bool Disposed { get; private set; }
     public int Height { get; private set; }
     public int Width { get; private set; }
@@ -20,9 +34,9 @@ public class DirectBitmap : IDisposable
     {
         Width = width;
         Height = height;
-        Bits = new Int32[width * height];
-        BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
-        Bitmap = new Bitmap(width, height, width * 4, PixelFormat.Format32bppPArgb, BitsHandle.AddrOfPinnedObject());
+        Bits = new byte[width * height];
+        //BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
+        //Bitmap = new Bitmap(width, height, width * 4, PixelFormat.Format32bppPArgb, BitsHandle.AddrOfPinnedObject());
     }
 
     public void SetPixel(int x, int y, Color colour)
@@ -30,7 +44,7 @@ public class DirectBitmap : IDisposable
         int index = x + (y * Width);
         int col = colour.ToArgb();
 
-        Bits[index] = col;
+        Bits[index] = (byte)col;
     }
 
     public Color GetPixel(int x, int y)
@@ -50,22 +64,30 @@ public class DirectBitmap : IDisposable
         BitsHandle.Free();
     }
 
-    public static DirectBitmap FromPixelArray(Pixel[,] pixels)
-    {
-        var w = pixels.GetLength(0);
-        var h = pixels.GetLength(1);
-        var result = new DirectBitmap(w,h);
+    //public static DirectBitmap FromPixelArray(int[] pixels)
+    //{
+    //    var w = pixels.GetLength(0);
+    //    var h = pixels.GetLength(1);
+    //    var result = new DirectBitmap(w,h);
+
+    //    for (int x = 0; x < w; x++)
+    //    {
+    //        for (int y = 0; y < h; y++)
+    //        {
+    //            result.Bits
+    //        }
+    //    }
         
-        Parallel.For(0, w, x =>
-        {
-            for (var y = 0; y < h; y++)
-            {
-                result.SetPixel(x,y,pixels[x,y]);
-            }  
-        });
+    //    Parallel.For(0, w, x =>
+    //    {
+    //        for (var y = 0; y < h; y++)
+    //        {
+    //            result.SetPixel(x,y,pixels[x,y]);
+    //        }  
+    //    });
         
-        return result;
-    }
+    //    return result;
+    //}
 }
 
 

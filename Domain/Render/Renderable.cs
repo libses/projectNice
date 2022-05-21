@@ -19,7 +19,7 @@ namespace Domain.Render
 
         protected readonly Context? GpuContext;
 
-        protected readonly Action<Index2D, TSettings, ArrayView2D<Pixel, Stride2D.DenseX>>? Kernel;
+        protected readonly Action<Index1D, TSettings, ArrayView1D<byte, Stride1D.Dense>>? Kernel;
 
 
         public void Dispose()
@@ -29,7 +29,7 @@ namespace Domain.Render
         }
 
         protected Renderable(int width, int height,
-            Action<Index2D, TSettings, ArrayView2D<Pixel, Stride2D.DenseX>> action)
+            Action<Index1D, TSettings, ArrayView1D<byte, Stride1D.Dense>> action)
         {
             if (!action.Method.IsStatic)
             {
@@ -72,14 +72,15 @@ namespace Domain.Render
             var sw = new Stopwatch();
             
             sw.Start();
-            using var buffer = Gpu!.Allocate2DDenseX<Pixel>(new Index2D(Width, Height));
+            var bmp = new DirectBitmap(Width, Height);
+            using var buffer = Gpu!.Allocate1D<byte>(Width * Height);
             Kernel!(buffer.IntExtent, Settings, buffer.View);
                 //Gpu.Synchronize();
             sw.Stop();
             Console.WriteLine($"Rendering from {Gpu?.Name}");
             Console.WriteLine("-----> " + sw.Elapsed);
-
-            return DirectBitmap.FromPixelArray(buffer.GetAsArray2D());
+            bmp.Bits = buffer.GetAsArray1D();
+            return bmp;
         }
     }
 }

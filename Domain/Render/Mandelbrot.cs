@@ -63,13 +63,13 @@ namespace Domain.Render
         {
         }
 
-        private static void ComputeFromGpu(Index2D index,
+        private static void ComputeFromGpu(Index1D index,
             MandelbrotSettings settings,
-            ArrayView2D<Pixel, Stride2D.DenseX> buffer)
+            ArrayView1D<byte, Stride1D.Dense> buffer)
         {
             var z = new Complex(0, 0);
-            var xxW = index.X / (double) settings.Width;
-            var yyW = index.Y / (double) settings.Height;
+            var xxW = (index.X % settings.Width) / (double) settings.Width;
+            var yyW = (index.X / settings.Width) / (double) settings.Height;
             var c = new Complex((xxW - 0.5) * settings.Scale + settings.A,
                 (yyW - 0.5) * settings.Scale + settings.B);
             for (int i = 1; i < 256; i++)
@@ -78,7 +78,7 @@ namespace Domain.Render
                 var modulo = z.Imaginary * z.Imaginary + z.Real * z.Real;
                 if (!(modulo >= 4)) continue;
                 var r = 255 - i;
-                buffer[index] = new Pixel(r, r, r, r);
+                buffer[index] = (byte)r;
                 break;
             }
         }

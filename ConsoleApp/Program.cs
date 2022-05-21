@@ -121,76 +121,76 @@ namespace ConsoleApp
 
         static void Main(string[] args)
         {
-            var x = 10_000;
-            var y = 10_000;
+            var x = 16384;
+            var y = 16384;
             new Mandelbrot(x, y)
-                .Config(new MandelbrotSettings(0, 0.311, 0.482, x, y))
+                .Config(new MandelbrotSettings(1, 0.311, 0.482, x, y))
                 .GetBitmap()
                 .Bitmap
                 .Save("aboba.bmp");
         }
 
-        public void BadExample_Planets()
-        {
-            var x = 500;
-            var y = 500;
-            var array = GenerateMusicVideo();
-            var planets = new Planets(x, y).Config(new PlanetsSettings(10, 10, 60, Brushes.White));
-            var db = new DirectBitmap[array.Item1.Length];
-            for (int i = 0; i < array.Item1.Length; i++)
-            {
-                var speed = array.Item1[i] + array.Item2[i] + array.Item3[i];
-                int R = (int) (array.Item1[i] * 255);
-                int G = (int) (array.Item2[i] * 255);
-                int B = (int) (array.Item3[i] * 255);
-                planets.speed = (float) speed;
-                var color = Color.FromArgb(R, G, B);
-                var constant = new Constant(x, y).Config(new ConstantSettings(color));
-                var bmp = planets.GetBitmap();
-                bmp.Multiply(constant.GetBitmap());
-                db[i] = bmp;
-            }
+        //public void BadExample_Planets()
+        //{
+        //    var x = 500;
+        //    var y = 500;
+        //    var array = GenerateMusicVideo();
+        //    var planets = new Planets(x, y).Config(new PlanetsSettings(10, 10, 60, Brushes.White));
+        //    var db = new DirectBitmap[array.Item1.Length];
+        //    for (int i = 0; i < array.Item1.Length; i++)
+        //    {
+        //        var speed = array.Item1[i] + array.Item2[i] + array.Item3[i];
+        //        int R = (int) (array.Item1[i] * 255);
+        //        int G = (int) (array.Item2[i] * 255);
+        //        int B = (int) (array.Item3[i] * 255);
+        //        planets.speed = (float) speed;
+        //        var color = Color.FromArgb(R, G, B);
+        //        var constant = new Constant(x, y).Config(new ConstantSettings(color));
+        //        var bmp = planets.GetBitmap();
+        //        bmp.Multiply(constant.GetBitmap());
+        //        db[i] = bmp;
+        //    }
 
-            CreateVideo(db, x, y, 44);
-        }
+        //    CreateVideo(db, x, y, 44);
+        //}
 
-        public void BadExample_TryFixThatShit()
-        {
-            var x = 1024;
-            var y = 1024;
-            // var windows = new Planets(x, y)
-            //     .Config(new PlanetsSettings(12, 300, 300, Brushes.White));
-            //
-            // var ashes = new Planets(x, y)
-            //     .Config(new PlanetsSettings(30, 6, 6, Brushes.White));
-            new Mandelbrot(x, y)
-                .Config(new MandelbrotSettings(0, 0.311, 0.482, x, y))
-                .GetBitmap()
-                .Bitmap
-                .Save("aboba.bmp");
-            var imgs = new List<(double, DirectBitmap)>();
-            var a = new List<double>();
-            for (var i = 0.01d; i < 1; i *= 1.02)
-            {
-                a.Add(i);
-            }
+        //public void BadExample_TryFixThatShit()
+        //{
+        //    var x = 1024;
+        //    var y = 1024;
+        //    // var windows = new Planets(x, y)
+        //    //     .Config(new PlanetsSettings(12, 300, 300, Brushes.White));
+        //    //
+        //    // var ashes = new Planets(x, y)
+        //    //     .Config(new PlanetsSettings(30, 6, 6, Brushes.White));
+        //    new Mandelbrot(x, y)
+        //        .Config(new MandelbrotSettings(0, 0.311, 0.482, x, y))
+        //        .GetBitmap()
+        //        .Bitmap
+        //        .Save("aboba.bmp");
+        //    var imgs = new List<(double, DirectBitmap)>();
+        //    var a = new List<double>();
+        //    for (var i = 0.01d; i < 1; i *= 1.02)
+        //    {
+        //        a.Add(i);
+        //    }
 
-            Console.Write(a.Count);
-            var d = a.AsParallel();
-            var consta = new Constant(x, y).Config(new ConstantSettings(Color.Blue));
-            d.ForAll(i =>
-            {
-                // not compile
-                // var bmp = ImageBase.Create()
-                //     .Config(new ImageSettings(x, y))
-                //     .Add<Mandelbrot>(m => m.Config(new MandelbrotSettings(i, 0.311, 0.482)))
-                //     .Multiply<Gradient>(g => g)
-                //     .GetBitmap().Multiply(consta.GetBitmap());
-                // imgs.Add((i, bmp));
-            });
+        //    Console.Write(a.Count);
+        //    var d = a.AsParallel();
+        //    var consta = new Constant(x, y).Config(new ConstantSettings(Color.Blue));
+        //    d.ForAll(i =>
+        //    {
+        //        // not compile
+        //        // var bmp = ImageBase.Create()
+        //        //     .Config(new ImageSettings(x, y))
+        //        //     .Add<Mandelbrot>(m => m.Config(new MandelbrotSettings(i, 0.311, 0.482)))
+        //        //     .Multiply<Gradient>(g => g)
+        //        //     .GetBitmap().Multiply(consta.GetBitmap());
+        //        // imgs.Add((i, bmp));
+        //    });
 
-            Console.WriteLine("video!");
-            //CreateVideo(imgs.OrderByDescending(x => x.Item1).Select(x => x.Item2.Add(ashes.GetBitmap()).Multiply(windows.GetBitmap())).ToArray(), x, y, 24);
-        }
+        //    Console.WriteLine("video!");
+        //    //CreateVideo(imgs.OrderByDescending(x => x.Item1).Select(x => x.Item2.Add(ashes.GetBitmap()).Multiply(windows.GetBitmap())).ToArray(), x, y, 24);
+        //}
     }
 }
