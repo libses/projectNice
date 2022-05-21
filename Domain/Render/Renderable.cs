@@ -68,12 +68,9 @@ namespace Domain.Render
             if (!IsGpuRenderable)
                 throw new ApplicationException($"{GetType().Name} cannot be used on GPU"
                                                + "\n For use CPU you need override GetBimap method");
-            var bmp = new DirectBitmap(Width, Height);
             using var buffer = Gpu!.Allocate1D<Int32>(Width * Height);
             Kernel!(buffer.IntExtent, Settings, buffer.View);
-                //Gpu.Synchronize();
-            bmp.Bits = buffer.GetAsArray1D();
-            return bmp;
+            return new DirectBitmap(buffer.GetAsArray1D(), Width, Height);
         }
     }
 }

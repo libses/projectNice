@@ -10,17 +10,14 @@ public class DirectBitmap : IDisposable
 {
     public Bitmap Bitmap { get; private set; }
 
-    private Int32[] bits;
+    private Int32[] data;
     
-    public Int32[] Bits {
-        get
-        {
-            return bits;
-        } 
+    public Int32[] Data {
+        get => data;
         set
         {
-            bits = value;
-            BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
+            data = value;
+            BitsHandle = GCHandle.Alloc(Data, GCHandleType.Pinned);
             Bitmap = new Bitmap(Width, Height, Width * 4, PixelFormat.Format32bppRgb, BitsHandle.AddrOfPinnedObject());
         }
     }
@@ -34,9 +31,16 @@ public class DirectBitmap : IDisposable
     {
         Width = width;
         Height = height;
-        Bits = new Int32[width * height];
+        Data = new Int32[width * height];
         //BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
         //Bitmap = new Bitmap(width, height, width * 4, PixelFormat.Format32bppPArgb, BitsHandle.AddrOfPinnedObject());
+    }
+
+    public DirectBitmap(int[] array, int width, int height)
+    {
+        Width = width;
+        Height = height;
+        Data = array;
     }
 
     public void SetPixel(int x, int y, Color colour)
@@ -44,13 +48,13 @@ public class DirectBitmap : IDisposable
         int index = x + (y * Width);
         int col = colour.ToArgb();
 
-        Bits[index] = (byte)col;
+        Data[index] = (byte)col;
     }
 
     public Color GetPixel(int x, int y)
     {
         int index = x + (y * Width);
-        int col = Bits[index];
+        int col = Data[index];
         Color result = Color.FromArgb(col);
 
         return result;
