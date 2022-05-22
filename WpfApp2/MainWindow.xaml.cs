@@ -29,18 +29,19 @@ namespace WpfApp2
     public partial class MainWindow : Window
     {
         private Image imgViewer;
-        private MediaPlayer mediaPlayer = new MediaPlayer();
+        private MediaPlayer mediaPlayer = new();
 
 
         public MainWindow()
         {
             InitializeComponent();
-            Task.Run(StartImageUpdater);
-           // StartImageUpdater();
             PlayBtn.Click += (_, _) =>
             {
-                isStarted = true;
-                mediaPlayer.Play();
+                if (videoInitialized)
+                {
+                    isStarted = true;
+                    mediaPlayer.Play();
+                }
             };
             PauseBtn.Click += (_, _) =>
             {
@@ -49,54 +50,30 @@ namespace WpfApp2
             };
         }
 
-        private double i = 1d;
-        private Mandelbrot mandelbrot = new Mandelbrot(1280, 720);
+        private static bool isStarted;
+        private static bool videoInitialized;
 
-        private static readonly Action EmptyDelegate = delegate { };
-        private static bool isStarted = false;
-
-        void StartImageUpdater()
+        void StartImageUpdater(string path)
         {
-            foreach (var bmp in Audio.BadExample_Planets())
+            var generator = new VideoGenerator(path, 1280, 720);
+            var i = 0;
+            foreach (var _ in generator.Planets(30))
             {
+                videoInitialized = true;
+                var temp = i;
+                i++;
                 while (!isStarted)
                 {
                 }
 
                 Dispatcher.Invoke(() =>
-                    ImageViewer1.Source = BitmapToImageSource(bmp)
-                );
-                Thread.Sleep(10);
-            }
-        }
-
-        public static ImageCodecInfo GetEncoder(ImageFormat format)
-        {
-            ImageCodecInfo[] codecs = ImageCodecInfo.GetImageDecoders();
-
-            foreach (ImageCodecInfo codec in codecs)
-            {
-                if (codec.FormatID == format.Guid)
                 {
-                    return codec;
-                }
+                    var img = new BitmapImage(new Uri(
+                        $@"C:\Users\Garipov\RiderProjects\ProjectNice\WpfApp2\bin\Debug\net6.0-windows\temp_img\{temp}.bmp"));
+                    return ImageViewer1.Source = img;
+                });
+                Thread.Sleep(6);
             }
-
-            return null;
-        }
-
-        static BitmapImage BitmapToImageSource(DirectBitmap bitmap)
-        {
-            using var memory = new MemoryStream();
-            bitmap.Bitmap.Save(memory, ImageFormat.Bmp);
-            memory.Position = 0;
-            var bitmapimage = new BitmapImage();
-            bitmapimage.BeginInit();
-            bitmapimage.StreamSource = memory;
-            bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
-            bitmapimage.EndInit();
-
-            return bitmapimage;
         }
 
         private void btnOpenFile_Click(object sender, RoutedEventArgs e)
@@ -106,6 +83,7 @@ namespace WpfApp2
             if (openFileDialog.ShowDialog() == true)
             {
                 mediaPlayer.Open(new Uri(openFileDialog.FileName));
+                Task.Run(() => StartImageUpdater(openFileDialog.FileName));
             }
         }
     }
