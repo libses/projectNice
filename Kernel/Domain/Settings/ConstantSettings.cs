@@ -1,7 +1,6 @@
 using System.Drawing;
-using Domain.Render;
 
-namespace Domain.Settings;
+namespace Kernel.Domain.Settings;
 
 public readonly struct ConstantSettings
 {

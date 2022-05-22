@@ -1,4 +1,4 @@
-﻿namespace Domain.Services;
+﻿namespace Kernel.Services.Interfaces;
 
 public interface IWavAudioProvider
 {

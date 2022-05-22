@@ -3,7 +3,7 @@ using System.Numerics;
 using ILGPU;
 using ILGPU.Runtime;
 
-namespace Domain.Render
+namespace Kernel.Domain
 {
     public readonly struct MandelbrotSettings
     {

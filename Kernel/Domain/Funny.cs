@@ -1,17 +1,10 @@
 ﻿using System.Drawing;
 using System.Numerics;
+using Kernel.Domain.Settings;
+using Kernel.Domain.Utils;
 
-namespace Domain.Render
+namespace Kernel.Domain
 {
-    public struct FunnySettings
-    {
-        public readonly IReadOnlyList<double[]> Fft;
-
-        public FunnySettings(List<double[]> fft)
-        {
-            Fft = fft;
-        }
-    }
     public class Funny : Renderable<Funny, FunnySettings>
     {
         bool isGenerated = false;

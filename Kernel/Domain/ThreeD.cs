@@ -1,7 +1,8 @@
 ﻿using System.Drawing;
 using System.Numerics;
+using Kernel.Domain.Utils;
 
-namespace Domain.Render
+namespace Kernel.Domain
 {
     public struct ThreeDSettings
     {

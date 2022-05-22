@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 #pragma warning disable CS8618
 
-namespace Domain;
+namespace Kernel.Domain.Utils;
 
 public class DirectBitmap : IDisposable
 {

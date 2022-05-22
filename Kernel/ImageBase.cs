@@ -1,6 +1,9 @@
-using Domain.Render;
+using Kernel.Domain;
+using Kernel.Domain.Interfaces;
+using Kernel.Domain.Settings;
+using Kernel.Domain.Utils;
 
-namespace Domain;
+namespace Kernel;
 
 public class ImageBase : Configurer<ImageSettings>
 {

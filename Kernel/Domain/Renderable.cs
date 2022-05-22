@@ -1,8 +1,9 @@
-﻿using System.Diagnostics;
-using ILGPU;
+﻿using ILGPU;
 using ILGPU.Runtime;
+using Kernel.Domain.Interfaces;
+using Kernel.Domain.Utils;
 
-namespace Domain.Render
+namespace Kernel.Domain
 {
     public abstract class Renderable<TContext, TSettings> : Configurer<TSettings>, IRenderable
         where TContext : Renderable<TContext, TSettings> where TSettings : struct

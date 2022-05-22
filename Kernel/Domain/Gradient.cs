@@ -1,8 +1,9 @@
 ﻿using System.Drawing;
 using System.Numerics;
-using Domain.Settings;
+using Kernel.Domain.Settings;
+using Kernel.Domain.Utils;
 
-namespace Domain.Render
+namespace Kernel.Domain
 {
     public class Gradient : Renderable<Gradient, GradientSettings>
     {

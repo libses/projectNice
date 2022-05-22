@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using Kernel.Services.Interfaces;
 
 namespace Domain.Services;
 

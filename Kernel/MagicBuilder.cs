@@ -1,6 +1,6 @@
 ﻿namespace Domain;
 
-public interface IMusic
+public class MagicBuilder
 {
     
 }

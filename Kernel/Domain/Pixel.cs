@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace Domain.Render;
+namespace Kernel.Domain;
 
 public readonly struct Pixel
 {

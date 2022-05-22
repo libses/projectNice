@@ -1,4 +1,5 @@
-﻿using Spectrogram;
+﻿using Kernel.Services.Interfaces;
+using Spectrogram;
 
 namespace Domain.Services;
 

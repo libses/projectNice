@@ -1,4 +1,4 @@
-namespace Domain;
+namespace Kernel.Domain.Settings;
 
 public readonly struct ImageSettings
 {

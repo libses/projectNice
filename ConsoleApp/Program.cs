@@ -1,13 +1,12 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using Domain.Render;
 using Domain.Services;
 using FFMediaToolkit.Encoding;
+using Kernel.Domain;
 
 namespace ConsoleApp
-{ 
+{
     internal class Program
     {
         static void Main(string[] args)
@@ -23,14 +22,14 @@ namespace ConsoleApp
                     .GetBitmap()
                     .Bitmap;
 
-                bmp.SaveJPG100(String.Format("temp\\{0}.jpg", counter));
+                bmp.SaveJPG100($"temp\\{counter}.jpg");
                 bmp.Dispose();
 
                 counter++;
             }
 
             var creator = new VideoCreator(@"C:\videos\example.mp4",
-                new VideoEncoderSettings(1920, 1080, 44, VideoCodec.H265));
+                new VideoEncoderSettings(1920, 1080, 44, VideoCodec.H264));
 
             var provider = new BitmapProvider("temp", "jpg", counter);
             creator.Create(provider.Get());

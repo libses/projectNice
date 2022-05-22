@@ -5,8 +5,9 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using Kernel.Domain.Utils;
 
-namespace Domain.Render
+namespace Kernel.Domain
 {
     public readonly struct PlanetsSettings
     {

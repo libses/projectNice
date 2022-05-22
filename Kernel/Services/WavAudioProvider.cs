@@ -1,4 +1,5 @@
-﻿using NAudio.Wave;
+﻿using Kernel.Services.Interfaces;
+using NAudio.Wave;
 
 namespace Domain.Services;
 
