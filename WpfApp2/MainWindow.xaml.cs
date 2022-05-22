@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Domain;
 using Domain.Render;
 using Microsoft.Win32;
+using NAudio.Wave;
 using Image = System.Windows.Controls.Image;
 
 namespace WpfApp2
@@ -25,28 +28,69 @@ namespace WpfApp2
     /// </summary>
     public partial class MainWindow : Window
     {
+        private Image imgViewer;
+        private MediaPlayer mediaPlayer = new MediaPlayer();
+
+
         public MainWindow()
         {
             InitializeComponent();
-            var i = 1d;
-            var bmp =
-                ImageBase.Create()
-                    .Config(new ImageSettings(1500, 1500))
-                    .Add<Mandelbrot>(m => m.Config(new MandelbrotSettings(i, 0.311, 0.482, 1500, 1500)))
-                    //.Multiply<Gradient>(g => g)
-                    .GetBitmap();
+            Task.Run(StartImageUpdater);
+           // StartImageUpdater();
+            PlayBtn.Click += (_, _) =>
+            {
+                isStarted = true;
+                mediaPlayer.Play();
+            };
+            PauseBtn.Click += (_, _) =>
+            {
+                isStarted = false;
+                mediaPlayer.Pause();
+            };
+        }
 
-            ImageViewer1.Source = BitmapToImageSource(bmp);
-            PlayBtn.Click += (_, _) => mediaPlayer.Play();
-            PauseBtn.Click += (_, _) => mediaPlayer.Pause();
+        private double i = 1d;
+        private Mandelbrot mandelbrot = new Mandelbrot(1280, 720);
+
+        private static readonly Action EmptyDelegate = delegate { };
+        private static bool isStarted = false;
+
+        void StartImageUpdater()
+        {
+            foreach (var bmp in Audio.BadExample_Planets())
+            {
+                while (!isStarted)
+                {
+                }
+
+                Dispatcher.Invoke(() =>
+                    ImageViewer1.Source = BitmapToImageSource(bmp)
+                );
+                Thread.Sleep(10);
+            }
+        }
+
+        public static ImageCodecInfo GetEncoder(ImageFormat format)
+        {
+            ImageCodecInfo[] codecs = ImageCodecInfo.GetImageDecoders();
+
+            foreach (ImageCodecInfo codec in codecs)
+            {
+                if (codec.FormatID == format.Guid)
+                {
+                    return codec;
+                }
+            }
+
+            return null;
         }
 
         static BitmapImage BitmapToImageSource(DirectBitmap bitmap)
         {
-            using MemoryStream memory = new MemoryStream();
-            bitmap.Bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
+            using var memory = new MemoryStream();
+            bitmap.Bitmap.Save(memory, ImageFormat.Bmp);
             memory.Position = 0;
-            BitmapImage bitmapimage = new BitmapImage();
+            var bitmapimage = new BitmapImage();
             bitmapimage.BeginInit();
             bitmapimage.StreamSource = memory;
             bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
@@ -54,8 +98,6 @@ namespace WpfApp2
 
             return bitmapimage;
         }
-
-        private MediaPlayer mediaPlayer = new MediaPlayer();
 
         private void btnOpenFile_Click(object sender, RoutedEventArgs e)
         {
@@ -65,7 +107,6 @@ namespace WpfApp2
             {
                 mediaPlayer.Open(new Uri(openFileDialog.FileName));
             }
-            
         }
     }
 }
