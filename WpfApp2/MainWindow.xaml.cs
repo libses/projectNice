@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Domain;
 using Domain.Render;
 using Microsoft.Win32;
+using NAudio.Wave;
 using Image = System.Windows.Controls.Image;
 
 namespace WpfApp2
@@ -25,37 +28,53 @@ namespace WpfApp2
     /// </summary>
     public partial class MainWindow : Window
     {
+        private Image imgViewer;
+        private MediaPlayer mediaPlayer = new();
+
+
         public MainWindow()
         {
             InitializeComponent();
-            var i = 1d;
-            var bmp =
-                ImageBase.Create()
-                    .Config(new ImageSettings(1500, 1500))
-                    .Add<Mandelbrot>(m => m.Config(new MandelbrotSettings(i, 0.311, 0.482, 1500, 1500)))
-                    //.Multiply<Gradient>(g => g)
-                    .GetBitmap();
-
-            ImageViewer1.Source = BitmapToImageSource(bmp);
-            PlayBtn.Click += (_, _) => mediaPlayer.Play();
-            PauseBtn.Click += (_, _) => mediaPlayer.Pause();
+            PlayBtn.Click += (_, _) =>
+            {
+                if (videoInitialized)
+                {
+                    isStarted = true;
+                    mediaPlayer.Play();
+                }
+            };
+            PauseBtn.Click += (_, _) =>
+            {
+                isStarted = false;
+                mediaPlayer.Pause();
+            };
         }
 
-        static BitmapImage BitmapToImageSource(DirectBitmap bitmap)
+        private static bool isStarted;
+        private static bool videoInitialized;
+
+        void StartImageUpdater(string path)
         {
-            using MemoryStream memory = new MemoryStream();
-            bitmap.Bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
-            memory.Position = 0;
-            BitmapImage bitmapimage = new BitmapImage();
-            bitmapimage.BeginInit();
-            bitmapimage.StreamSource = memory;
-            bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
-            bitmapimage.EndInit();
+            var generator = new VideoGenerator(path, 1280, 720);
+            var i = 0;
+            foreach (var _ in generator.Planets(30))
+            {
+                videoInitialized = true;
+                var temp = i;
+                i++;
+                while (!isStarted)
+                {
+                }
 
-            return bitmapimage;
+                Dispatcher.Invoke(() =>
+                {
+                    var img = new BitmapImage(new Uri(
+                        $@"C:\Users\Garipov\RiderProjects\ProjectNice\WpfApp2\bin\Debug\net6.0-windows\temp_img\{temp}.bmp"));
+                    return ImageViewer1.Source = img;
+                });
+                Thread.Sleep(6);
+            }
         }
-
-        private MediaPlayer mediaPlayer = new MediaPlayer();
 
         private void btnOpenFile_Click(object sender, RoutedEventArgs e)
         {
@@ -64,8 +83,8 @@ namespace WpfApp2
             if (openFileDialog.ShowDialog() == true)
             {
                 mediaPlayer.Open(new Uri(openFileDialog.FileName));
+                Task.Run(() => StartImageUpdater(openFileDialog.FileName));
             }
-            
         }
     }
 }
