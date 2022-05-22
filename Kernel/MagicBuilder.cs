@@ -1,6 +1,12 @@
-﻿namespace Domain;
+﻿using Ninject;
 
-public class MagicBuilder
+namespace Kernel;
+
+public static class MagicBuilder
 {
-    
+    public static StandardKernel ConfigureMagic()
+    {
+        var kernel = new StandardKernel();
+        return kernel;
+    }
 }

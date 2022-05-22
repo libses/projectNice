@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp", "ConsoleApp\Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp2", "WpfApp2\WpfApp2.csproj", "{2E2BC169-9A96-41E3-AC6E-EFD5C75E74C7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KernelTests", "KernelTests\KernelTests.csproj", "{84406EFE-6F22-4F17-ADCE-CC4BAB328C38}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{2E2BC169-9A96-41E3-AC6E-EFD5C75E74C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E2BC169-9A96-41E3-AC6E-EFD5C75E74C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2E2BC169-9A96-41E3-AC6E-EFD5C75E74C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84406EFE-6F22-4F17-ADCE-CC4BAB328C38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84406EFE-6F22-4F17-ADCE-CC4BAB328C38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84406EFE-6F22-4F17-ADCE-CC4BAB328C38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84406EFE-6F22-4F17-ADCE-CC4BAB328C38}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

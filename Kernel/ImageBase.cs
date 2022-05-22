@@ -1,4 +1,3 @@
-using Kernel.Domain;
 using Kernel.Domain.Interfaces;
 using Kernel.Domain.Settings;
 using Kernel.Domain.Utils;
