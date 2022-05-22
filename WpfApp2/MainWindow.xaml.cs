@@ -1,18 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using Domain;
-using Domain.Render;
 using Microsoft.Win32;
-using NAudio.Wave;
-using Image = System.Windows.Controls.Image;
 
 namespace WpfApp2
 {
@@ -28,8 +20,7 @@ namespace WpfApp2
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Image imgViewer;
-        private MediaPlayer mediaPlayer = new();
+        private readonly MediaPlayer mediaPlayer = new();
 
 
         public MainWindow()
@@ -37,11 +28,12 @@ namespace WpfApp2
             InitializeComponent();
             PlayBtn.Click += (_, _) =>
             {
-                if (videoInitialized)
+                while (!videoInitialized)
                 {
-                    isStarted = true;
-                    mediaPlayer.Play();
                 }
+
+                isStarted = true;
+                mediaPlayer.Play();
             };
             PauseBtn.Click += (_, _) =>
             {
@@ -53,7 +45,7 @@ namespace WpfApp2
         private static bool isStarted;
         private static bool videoInitialized;
 
-        void StartImageUpdater(string path)
+        private void StartImageUpdater(string path, CancellationToken ct)
         {
             var generator = new VideoGenerator(path, 1280, 720);
             var i = 0;
@@ -62,6 +54,8 @@ namespace WpfApp2
                 videoInitialized = true;
                 var temp = i;
                 i++;
+                if (ct.IsCancellationRequested)
+                    break;
                 while (!isStarted)
                 {
                 }
@@ -76,14 +70,21 @@ namespace WpfApp2
             }
         }
 
+        private CancellationTokenSource cts = new();
+
         private void btnOpenFile_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Audio files (*.mp3;*.wav;*.aac)|*.mp3;*.wav;*.aac";
+            var openFileDialog = new OpenFileDialog
+            {
+                Filter = "Audio files (*.mp3;*.wav;*.aac)|*.mp3;*.wav;*.aac"
+            };
+            cts.Cancel();
+            cts = new CancellationTokenSource();
             if (openFileDialog.ShowDialog() == true)
             {
                 mediaPlayer.Open(new Uri(openFileDialog.FileName));
-                Task.Run(() => StartImageUpdater(openFileDialog.FileName));
+                isStarted = false;
+                Task.Run(() => StartImageUpdater(openFileDialog.FileName, cts.Token));
             }
         }
     }
