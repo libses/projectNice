@@ -9,18 +9,15 @@ namespace Domain
 {
     public static class Combinations
     {
-        public static DirectBitmap Add(this DirectBitmap f, DirectBitmap s)
+        public static void Add(this DirectBitmap f, DirectBitmap s)
         {
-            var bmp = new DirectBitmap(f.Width, f.Height);
             for (int x = 0; x < f.Width; x++)
             {
                 for (int y = 0; y < f.Height; y++)
                 {
-                    bmp.SetPixel(x, y, f.GetPixel(x, y).Add(s.GetPixel(x, y)));
+                    f.SetPixel(x, y, f.GetPixel(x, y).Add(s.GetPixel(x, y)));
                 }
             }
-
-            return bmp;
         }
 
         public static void Multiply(this DirectBitmap f, DirectBitmap s)

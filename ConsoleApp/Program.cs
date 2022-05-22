@@ -148,14 +148,25 @@ namespace ConsoleApp
 
         static void Main(string[] args)
         {
-            var x = 1280;
+            ImageBase.Create()
+                .Config(new ImageSettings(1280, 720))
+                .Add<Mandelbrot>(m => m.Config(new MandelbrotSettings(1, -0.94, 0.113075, 1280, 720)))
+                .Multiply<Mandelbrot>(m => m.Config(new MandelbrotSettings(0.2,  -0.74529, 0.113075, 1280, 720)))
+                .Multiply<Mandelbrot>(m => m.Config(new MandelbrotSettings(1.2,  -0.1, 0.115, 1280, 720)))
+                .Multiply<Mandelbrot>(m => m.Config(new MandelbrotSettings(1.2,  -0.1, 0.115, 1280, 720)))
+                .Multiply<Mandelbrot>(m => m.Config(new MandelbrotSettings(1.2,  -0.1, 0.115, 1280, 720)))
+                .GetBitmap()
+                .Bitmap
+                .Save("aboba.bmp");
+            
+            /*var x = 1280;
             var y = 720;
             var mandel = new Mandelbrot(x, y);
             var counter = 0;
             for (double i = 1d; i > 0.0001d; i *= 0.99)
             {
                 mandel
-                    .Config(new MandelbrotSettings(i, -0.74529, 0.113075, x, y))
+                    .Config(new MandelbrotSettings(i, -0.74529, 0.113075))
                     .GetBitmap()
                     .Bitmap
                     .SaveJPG100(String.Format("temp\\{0}.jpg", counter));
@@ -163,7 +174,7 @@ namespace ConsoleApp
                 counter++;
             }
 
-            CreateVideoYield(PhotoYielder(counter), 1280, 720, 44);
+            CreateVideoYield(PhotoYielder(counter), 1280, 720, 44);*/
         }
 
         //public void BadExample_Planets()

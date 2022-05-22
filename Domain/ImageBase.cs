@@ -4,11 +4,11 @@ namespace Domain;
 
 public class ImageBase : Configurer<ImageSettings>
 {
-    private readonly List<(Type, Func<DirectBitmap, DirectBitmap, DirectBitmap>, Delegate)> items;
+    private readonly List<(Type, Action<DirectBitmap, DirectBitmap>, Delegate)> items;
     
     private ImageBase()
     {
-        items = new List<(Type, Func<DirectBitmap, DirectBitmap, DirectBitmap>, Delegate)>();
+        items = new List<(Type, Action<DirectBitmap, DirectBitmap>, Delegate)>();
     }
 
     public static ConfigurationContext<ImageBase, ImageBase, ImageSettings> Create()
@@ -32,22 +32,21 @@ public class ImageBase : Configurer<ImageSettings>
     }
 
 
-    //plz fix
-    //public ImageBase Multiply<TRenderable>(Func<TRenderable, TRenderable> renderable)
-    //where TRenderable : IRenderable
-    //{
-    //    items.Add(
-    //        (typeof(TRenderable),
-    //            (x, y) => x.Multiply(y),
-    //            renderable)
-    //    );
-    //    return this;
-    //}
+    public ImageBase Multiply<TRenderable>(Func<TRenderable, TRenderable> renderable)
+    where TRenderable : IRenderable
+    {
+        items.Add(
+            (typeof(TRenderable),
+                (x, y) => x.Multiply(y),
+                renderable)
+        );
+        return this;
+    }
 
     public DirectBitmap GetBitmap()
     {
-        var bitmap = new DirectBitmap(Settings.Width, Settings.Height);
-        foreach (var (type, expression, getter) in items)
+        var baseBitmap = new DirectBitmap(Settings.Width, Settings.Height);
+        foreach (var (type, action, getter) in items)
         {
             var obj = type
                 .GetConstructor(new[] {typeof(int), typeof(int)})?.Invoke(new[]
@@ -55,10 +54,10 @@ public class ImageBase : Configurer<ImageSettings>
                     Settings.Width, (object) Settings.Height
                 });
             var renderable = getter.DynamicInvoke(obj) as IRenderable;
-            bitmap = expression(bitmap, renderable.GetBitmap());
+            action(baseBitmap, renderable.GetBitmap());
         }
 
-        return bitmap;
+        return baseBitmap;
     }
 }
 
