@@ -1,16 +1,23 @@
-﻿using Domain;
+﻿using AnimatedGif;
+using Domain;
 using FFMediaToolkit;
 using FFMediaToolkit.Encoding;
 using FFMediaToolkit.Graphics;
+using NAudio.Dsp;
 using NAudio.Wave;
 using Spectrogram;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Security.Principal;
+using System.Threading;
+using System.Threading.Tasks;
 using Domain.Render;
+using Domain.Settings;
 
 namespace ConsoleApp
 {
@@ -113,7 +120,7 @@ namespace ConsoleApp
         {
             for (int i = 0; i < count; i++)
             {
-                yield return (Bitmap)Bitmap.FromFile("temp\\" + i + ".jpg");
+                yield return (Bitmap) Bitmap.FromFile("temp\\" + i + ".jpg");
             }
         }
 
@@ -142,24 +149,30 @@ namespace ConsoleApp
 
         static void Main(string[] args)
         {
-            var x = 1920;
-            var y = 1080;
+            var x = 1280;
+            var y = 720;
             var mandel = new Mandelbrot(x, y);
+            var sw = new Stopwatch();
+            sw.Start();
+            if (!Directory.Exists("./temp"))
+                Directory.CreateDirectory("./temp");
+            var bmp = mandel.Config(new MandelbrotSettings(1d, -0.74529, 0.113075, x, y)).GetBitmap();
+            bmp.Bitmap.SaveJPG100($"temp/0.jpg");
             var counter = 0;
-            for (double i = 1d; i > 0.1d; i *= 0.993)
+            for (var i = 1d * 0.99; i > 0.0001d; i *= 0.99)
             {
-                var bmp = mandel
+                mandel
                     .Config(new MandelbrotSettings(i, -0.74529, 0.113075, x, y))
-                    .GetBitmap()
-                    .Bitmap;
-
-                bmp.SaveJPG100(String.Format("temp\\{0}.jpg", counter));
-                bmp.Dispose();
+                    .Update(bmp)
+                    .Bitmap
+                    .SaveJPG100($"temp\\{counter}.jpg");
 
                 counter++;
             }
 
-            CreateVideoYield(PhotoYielder(counter), 1920, 1080, 44);
+            sw.Stop();
+            Console.WriteLine(sw.Elapsed);
+            //CreateVideoYield(PhotoYielder(counter), 1280, 720, 44);
         }
 
         //public void BadExample_Planets()
