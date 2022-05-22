@@ -1,23 +1,17 @@
-﻿using AnimatedGif;
-using Domain;
-using FFMediaToolkit;
-using FFMediaToolkit.Encoding;
-using FFMediaToolkit.Graphics;
-using NAudio.Dsp;
-using NAudio.Wave;
-using Spectrogram;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Security.Principal;
-using System.Threading;
-using System.Threading.Tasks;
-using Domain.Render;
-using Domain.Settings;
+using FFMediaToolkit;
+using FFMediaToolkit.Encoding;
+using FFMediaToolkit.Graphics;
+using Kernel.Domain;
+using Kernel.Domain.Utils;
+using NAudio.Wave;
+using Spectrogram;
 
 namespace ConsoleApp
 {
@@ -244,14 +238,14 @@ namespace ConsoleApp
         public static void SaveJPG100(this Bitmap bmp, string filename)
         {
             EncoderParameters encoderParameters = new EncoderParameters(1);
-            encoderParameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 100L);
+            encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 100L);
             bmp.Save(filename, GetEncoder(ImageFormat.Jpeg), encoderParameters);
         }
 
         public static void SaveJPG100(this Bitmap bmp, Stream stream)
         {
             EncoderParameters encoderParameters = new EncoderParameters(1);
-            encoderParameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 100L);
+            encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 100L);
             bmp.Save(stream, GetEncoder(ImageFormat.Jpeg), encoderParameters);
         }
 

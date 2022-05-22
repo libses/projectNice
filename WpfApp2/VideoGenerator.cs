@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.Linq;
-using System.Threading.Tasks;
-using Domain;
-using Domain.Render;
-using Domain.Settings;
-using FFMediaToolkit;
-using FFMediaToolkit.Encoding;
-using FFMediaToolkit.Graphics;
-using ILGPU;
+using Kernel.Domain;
+using Kernel.Domain.Settings;
 using NAudio.Wave;
 using Spectrogram;
 
