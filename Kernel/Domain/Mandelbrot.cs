@@ -1,7 +1,9 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.Numerics;
 using ILGPU;
 using ILGPU.Runtime;
+using Kernel.Domain.Gpu;
 
 namespace Kernel.Domain
 {
@@ -24,9 +26,10 @@ namespace Kernel.Domain
     }
 
     [SuppressMessage("ReSharper", "PossibleLossOfFraction")]
-    public class Mandelbrot : Renderable<Mandelbrot, MandelbrotSettings>
+    public class Mandelbrot : GpuRenderable<Mandelbrot, MandelbrotSettings>
+        /*Renderable<Mandelbrot, MandelbrotSettings>,*/
     {
-        public Mandelbrot(int width, int height) : base(width, height, ComputeFromGpu)
+        public Mandelbrot(int width, int height) : base(new Size(width, height), ComputeFromGpu)
         {
         }
 
@@ -34,7 +37,7 @@ namespace Kernel.Domain
             MandelbrotSettings settings,
             ArrayView1D<Int32, Stride1D.Dense> buffer)
         {
-            var z = new Complex(0, 0);
+            var z =Complex.Zero;
             var xxW = index.X % settings.Width / (double) settings.Width;
             var yyW = index.X / settings.Width / (double) settings.Height;
             var c = new Complex((xxW - 0.5) * settings.Scale + settings.A,

@@ -27,6 +27,8 @@ public class DirectBitmap : IDisposable
     public int Height { get; private set; }
     public int Width { get; private set; }
 
+    public Size ImageSize => new(Width, Height);
+
     protected GCHandle BitsHandle { get; private set; }
 
     public DirectBitmap(int width, int height)
@@ -48,7 +50,7 @@ public class DirectBitmap : IDisposable
         int index = x + (y * Width);
         int col = colour.ToArgb();
 
-        Data[index] = (byte)col;
+        Data[index] = (byte) col;
     }
 
     public Color GetPixel(int x, int y)

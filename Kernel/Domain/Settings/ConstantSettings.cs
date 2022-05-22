@@ -4,15 +4,15 @@ namespace Kernel.Domain.Settings;
 
 public readonly struct ConstantSettings
 {
-    public readonly Pixel Color;
+    public readonly Int32 Color;
 
-    public ConstantSettings(Pixel color)
+    public ConstantSettings(Int32 color)
     {
         Color = color;
     }
 
     public ConstantSettings(Color color)
     {
-        Color = new Pixel(color);
+        Color = color.ToArgb();
     }
 }
