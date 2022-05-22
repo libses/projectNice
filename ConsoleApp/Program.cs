@@ -1,9 +1,7 @@
-﻿using AnimatedGif;
-using Domain;
+﻿using Domain;
 using FFMediaToolkit;
 using FFMediaToolkit.Encoding;
 using FFMediaToolkit.Graphics;
-using NAudio.Dsp;
 using NAudio.Wave;
 using Spectrogram;
 using System;
@@ -12,11 +10,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Security.Principal;
-using System.Threading;
-using System.Threading.Tasks;
 using Domain.Render;
-using Domain.Settings;
 
 namespace ConsoleApp
 {
@@ -148,22 +142,24 @@ namespace ConsoleApp
 
         static void Main(string[] args)
         {
-            var x = 1280;
-            var y = 720;
+            var x = 1920;
+            var y = 1080;
             var mandel = new Mandelbrot(x, y);
             var counter = 0;
-            for (double i = 1d; i > 0.0001d; i *= 0.99)
+            for (double i = 1d; i > 0.1d; i *= 0.993)
             {
-                mandel
+                var bmp = mandel
                     .Config(new MandelbrotSettings(i, -0.74529, 0.113075, x, y))
                     .GetBitmap()
-                    .Bitmap
-                    .SaveJPG100(String.Format("temp\\{0}.jpg", counter));
+                    .Bitmap;
+
+                bmp.SaveJPG100(String.Format("temp\\{0}.jpg", counter));
+                bmp.Dispose();
 
                 counter++;
             }
 
-            CreateVideoYield(PhotoYielder(counter), 1280, 720, 44);
+            CreateVideoYield(PhotoYielder(counter), 1920, 1080, 44);
         }
 
         //public void BadExample_Planets()
