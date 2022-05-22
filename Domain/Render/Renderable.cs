@@ -4,6 +4,9 @@ using ILGPU.Runtime;
 
 namespace Domain.Render
 {
+    //TODO     Все операции над картинками -- в видеокарте. IVAN
+    //TODO Решить вопрос с аллокацией памяти. IVAN
+    
     public abstract class Renderable<TContext, TSettings> : Configurer<TSettings>, IRenderable
         where TContext : Renderable<TContext, TSettings> where TSettings : struct
     {
@@ -65,12 +68,26 @@ namespace Domain.Render
 
         public virtual DirectBitmap GetBitmap()
         {
-            if (!IsGpuRenderable)
-                throw new ApplicationException($"{GetType().Name} cannot be used on GPU"
-                                               + "\n For use CPU you need override GetBimap method");
+            CheckGpu();
             using var buffer = Gpu!.Allocate1D<Int32>(Width * Height);
             Kernel!(buffer.IntExtent, Settings, buffer.View);
             return new DirectBitmap(buffer.GetAsArray1D(), Width, Height);
+        }
+        
+        public DirectBitmap Update(DirectBitmap bitmap)
+        {
+            CheckGpu();
+            using var buffer = Gpu!.Allocate1D<Int32>(Width * Height);
+            Kernel!(buffer.IntExtent, Settings, buffer.View);
+            buffer.CopyToCPU(bitmap.Data);
+            return bitmap;
+        }
+
+        private void CheckGpu()
+        {
+            if (!IsGpuRenderable)
+                throw new ApplicationException($"{GetType().Name} cannot be used on GPU"
+                                               + "\n For use CPU you need override GetBimap method");
         }
     }
 }

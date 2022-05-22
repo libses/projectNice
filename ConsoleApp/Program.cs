@@ -8,6 +8,7 @@ using NAudio.Wave;
 using Spectrogram;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -119,7 +120,7 @@ namespace ConsoleApp
         {
             for (int i = 0; i < count; i++)
             {
-                yield return (Bitmap)Bitmap.FromFile("temp\\" + i + ".jpg");
+                yield return (Bitmap) Bitmap.FromFile("temp\\" + i + ".jpg");
             }
         }
 
@@ -151,19 +152,27 @@ namespace ConsoleApp
             var x = 1280;
             var y = 720;
             var mandel = new Mandelbrot(x, y);
+            var sw = new Stopwatch();
+            sw.Start();
+            if (!Directory.Exists("./temp"))
+                Directory.CreateDirectory("./temp");
+            var bmp = mandel.Config(new MandelbrotSettings(1d, -0.74529, 0.113075, x, y)).GetBitmap();
+            bmp.Bitmap.SaveJPG100($"temp/0.jpg");
             var counter = 0;
-            for (double i = 1d; i > 0.0001d; i *= 0.99)
+            for (var i = 1d * 0.99; i > 0.0001d; i *= 0.99)
             {
                 mandel
                     .Config(new MandelbrotSettings(i, -0.74529, 0.113075, x, y))
-                    .GetBitmap()
+                    .Update(bmp)
                     .Bitmap
-                    .SaveJPG100(String.Format("temp\\{0}.jpg", counter));
+                    .SaveJPG100($"temp\\{counter}.jpg");
 
                 counter++;
             }
 
-            CreateVideoYield(PhotoYielder(counter), 1280, 720, 44);
+            sw.Stop();
+            Console.WriteLine(sw.Elapsed);
+            //CreateVideoYield(PhotoYielder(counter), 1280, 720, 44);
         }
 
         //public void BadExample_Planets()
