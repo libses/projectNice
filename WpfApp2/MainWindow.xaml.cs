@@ -13,6 +13,13 @@ using Image = System.Windows.Controls.Image;
 
 namespace WpfApp2
 {
+    // TODO : Сделать рендер реального времени (или псевдо-), так, чтобы музыка и видео воспроизводились синхронно. NAZAR
+    // 44.1 fps (1/44.1) NAZAR
+    // Все операции над картинками -- в видеокарте. IVAN
+    // Добавить ещё операций, кроме Add и Multiply, другие фракталы/картинки
+    // Решить вопрос с аллокацией памяти. IVAN
+    // Почитать регламент и сделать Readme.md и тому подобное.
+    // Тесты, DDD, DI. Alexey
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -25,8 +32,8 @@ namespace WpfApp2
             var bmp =
                 ImageBase.Create()
                     .Config(new ImageSettings(1500, 1500))
-                    .Add<Mandelbrot>(m => m.Config(new MandelbrotSettings(i, 0.311, 0.482)))
-                    .Multiply<Gradient>(g => g)
+                    .Add<Mandelbrot>(m => m.Config(new MandelbrotSettings(i, 0.311, 0.482, 1500, 1500)))
+                    //.Multiply<Gradient>(g => g)
                     .GetBitmap();
 
             ImageViewer1.Source = BitmapToImageSource(bmp);
