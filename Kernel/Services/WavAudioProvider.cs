@@ -1,20 +1,18 @@
 ﻿using Kernel.Services.Interfaces;
 using NAudio.Wave;
 
-namespace Domain.Services;
+namespace Kernel.Services;
 
 public class WavAudioMonoProvider : IWavAudioProvider
 {
-    private readonly string filename;
     private readonly double multiplier;
 
-    public WavAudioMonoProvider(string filename, double multiplier)
+    public WavAudioMonoProvider(double multiplier)
     {
-        this.filename = filename;
         this.multiplier = multiplier;
     }
     
-    public (double[] audio, int sampleRate) ReadWav()
+    public (double[] audio, int sampleRate) ReadWav(string filename)
     {
         using var afr = new AudioFileReader(filename);
         var sampleRate = afr.WaveFormat.SampleRate;

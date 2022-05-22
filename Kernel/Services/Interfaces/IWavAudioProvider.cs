@@ -2,5 +2,5 @@
 
 public interface IWavAudioProvider
 {
-    public (double[] audio, int sampleRate) ReadWav();
+    public (double[] audio, int sampleRate) ReadWav(string filename);
 }

@@ -2,7 +2,7 @@ using Kernel.Domain.Interfaces;
 using Kernel.Domain.Settings;
 using Kernel.Domain.Utils;
 
-namespace Kernel;
+namespace Kernel.Services;
 
 public class ImageBase : Configurer<ImageSettings>
 {

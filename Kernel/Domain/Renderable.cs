@@ -2,6 +2,7 @@
 using ILGPU.Runtime;
 using Kernel.Domain.Interfaces;
 using Kernel.Domain.Utils;
+using Kernel.Services;
 
 namespace Kernel.Domain
 {

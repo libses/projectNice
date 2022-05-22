@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using Kernel.Services.Interfaces;
 
-namespace Domain.Services;
+namespace Kernel.Services;
 
 public class BitmapProvider : IImageProvider<Bitmap>
 {

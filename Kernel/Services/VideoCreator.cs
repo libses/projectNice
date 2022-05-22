@@ -1,27 +1,20 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
-using FFMediaToolkit;
 using FFMediaToolkit.Encoding;
 using FFMediaToolkit.Graphics;
 
-namespace Domain.Services;
+namespace Kernel.Services;
 
 public class VideoCreator
 {
-    public static string FFmpegPath = @"C:\ff\bin";
-    
-    private readonly string filename;
     private readonly VideoEncoderSettings settings;
     
-    public VideoCreator(string filename, VideoEncoderSettings settings)
+    public VideoCreator(VideoEncoderSettings settings)
     {
-        FFmpegLoader.FFmpegPath = FFmpegPath;
-        
-        this.filename = filename;
         this.settings = settings;
     }
     
-    public void Create(IEnumerable<Bitmap> bitmaps)
+    public void Create(IEnumerable<Bitmap> bitmaps, string filename)
     {
         using var file = MediaBuilder
             .CreateContainer(filename)

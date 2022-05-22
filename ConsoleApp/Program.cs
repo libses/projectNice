@@ -1,7 +1,8 @@
-﻿using Domain.Services;
-using FFMediaToolkit.Encoding;
+﻿using FFMediaToolkit.Encoding;
+using Kernel;
 using Kernel.Domain;
 using Kernel.Domain.Utils;
+using Kernel.Services;
 
 namespace ConsoleApp
 {
@@ -23,12 +24,6 @@ namespace ConsoleApp
                 bmp.SaveJPG100($"temp\\{counter}.jpg");
                 counter++;
             }
-
-            var creator = new VideoCreator(@"C:\videos\example.mp4",
-                new VideoEncoderSettings(1920, 1080, 44, VideoCodec.H264));
-
-            var provider = new BitmapProvider("temp", "jpg", counter);
-            creator.Create(provider.Get());
         }
     }
 }
