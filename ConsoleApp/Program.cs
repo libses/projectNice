@@ -1,4 +1,4 @@
-﻿using FFMediaToolkit.Encoding;
+using FFMediaToolkit.Encoding;
 using Kernel;
 using Kernel.Domain;
 using Kernel.Domain.Utils;
