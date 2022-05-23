@@ -1,8 +1,10 @@
 ﻿using FakeItEasy;
 using FluentAssertions;
+using Kernel;
 using Kernel.Domain;
 using Kernel.Domain.Settings;
 using Kernel.Domain.Utils;
+using Kernel.Services;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -60,10 +62,17 @@ namespace KernelTests
     public class ConstantShould
     {
         [Test]
-        public void TestConstantInit()
+        public void TestConstantInitColor()
         {
             var c = new Constant(100, 100).Config(new ConstantSettings(Color.FromArgb(12, 34, 56, 78)));
             c.GetBitmap().GetPixel(1, 1).Should().Be(Color.FromArgb(12, 34, 56, 78));
+        }
+
+        [Test]
+        public void TestConstantInitPixel()
+        {
+            var c = new Constant(100, 100).Config(new ConstantSettings(new Pixel(12, 34, 56, 78)));
+            c.GetBitmap().GetPixel(1, 1).Should().Be(Color.FromArgb(78, 12, 34, 56));
         }
     }
 
@@ -80,6 +89,16 @@ namespace KernelTests
         }
 
         [Test]
+        public void TestAddOverflow()
+        {
+            var f = new Constant(100, 100).Config(new ConstantSettings(Color.FromArgb(200, 200, 200)));
+            var s = new Constant(100, 100).Config(new ConstantSettings(Color.FromArgb(200, 200, 200)));
+            var bmp = f.GetBitmap();
+            bmp.Add(s.GetBitmap());
+            bmp.GetPixel(0, 1).Should().Be(Color.FromArgb(255, 255, 255));
+        }
+
+        [Test]
         public void TestMultiply()
         {
             var f = new Constant(100, 100).Config(new ConstantSettings(Color.FromArgb(255, 255, 255)));
@@ -87,6 +106,64 @@ namespace KernelTests
             var bmp = f.GetBitmap();
             bmp.Multiply(s.GetBitmap());
             bmp.GetPixel(0, 1).Should().Be(Color.FromArgb(1, 1, 1));
+        }
+    }
+
+    public class KernelBuilderTests
+    {
+        [Test]
+        public void TestKernelBuildNotCrash()
+        {
+            Action creation = () => KernelBuilder.Create();
+            creation.Should().NotThrow();
+        }
+    }
+
+    public class BitmapExtensionsTests
+    {
+        [Test]
+        public void TestJPGSave()
+        {
+            var f = new Constant(100, 100).Config(new ConstantSettings(Color.FromArgb(123, 123, 123)));
+            f.GetBitmap().Bitmap.SaveJPG100("aboba.jpg");
+            var bmp = Bitmap.FromFile("aboba.jpg");
+            ((Bitmap)bmp).GetPixel(0, 0).Should().Be(Color.FromArgb(123, 123, 123));
+            bmp.Dispose();
+            File.Delete("aboba.jpg");
+        }
+    }
+
+    public class BitmapProviderTests
+    {
+        [Test]
+        public void TestProvide()
+        {
+            Directory.CreateDirectory("temp");
+            var f = new Constant(100, 100).Config(new ConstantSettings(Color.FromArgb(123, 123, 123)));
+            var bmp = f.GetBitmap().Bitmap;
+            bmp.SaveJPG100("temp\\0.jpg");
+            bmp.SaveJPG100("temp\\1.jpg");
+            var provider = new BitmapProvider("temp", "jpg", 2);
+            var bmps = provider.Get().ToList();
+            bmps.Count.Should().Be(2);
+            bmps[0].GetPixel(0, 0).Should().Be(bmp.GetPixel(0, 0));
+            bmp.Dispose();
+            provider.Dispose();
+            File.Delete("temp\\0.jpg");
+            File.Delete("temp\\1.jpg");
+            Directory.Delete("temp");
+        }
+    }
+
+    public class FunnyTests
+    {
+        [Test]
+        public void TestFunnyEmptyFft()
+        {
+            var doubles = new double[100];
+            var doublesList = new List<double[]> { doubles };
+            var funny = new Funny(100, 100).Config(new FunnySettings(doublesList));
+            funny.GetBitmap().GetPixel(0, 0).Should().Be(Color.FromArgb(0, 0, 0, 0));
         }
     }
 }
