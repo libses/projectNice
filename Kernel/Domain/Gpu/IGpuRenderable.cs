@@ -12,8 +12,8 @@ public interface IGpuRenderable<TGpuRen, TSettings>
     Size ImageSize { get; }
     TSettings Settings { get; set; }
     MemoryBuffer1D<int, Stride1D.Dense>? GetBuffer();
+    TGpuRen CopyToBitmap(DirectBitmap bitmap);
     DirectBitmap ToBitmap();
-    DirectBitmap CopyToBitmap(DirectBitmap bitmap);
 
     TGpuRen Apply();
 

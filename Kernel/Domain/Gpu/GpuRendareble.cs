@@ -10,7 +10,6 @@ public abstract class GpuRenderable<TGpuRen, TSettings> : IGpuRenderable<TGpuRen
     where TGpuRen : class, IGpuRenderable<TGpuRen, TSettings>
     where TSettings : struct
 {
-
     protected GpuRenderable(Size imageSize, Action<Index1D, TSettings, ArrayView1D<int, Dense>> kernel)
     {
         if (!kernel.Method.IsStatic) throw new ArgumentException("The method should be static");
@@ -33,11 +32,11 @@ public abstract class GpuRenderable<TGpuRen, TSettings> : IGpuRenderable<TGpuRen
         return new DirectBitmap(buffer.GetAsArray1D(), ImageSize.Width, ImageSize.Height);
     }
 
-    public DirectBitmap CopyToBitmap(DirectBitmap bitmap)
+    public TGpuRen CopyToBitmap(DirectBitmap bitmap)
     {
         if (bitmap.ImageSize != ImageSize) throw new ArgumentException($"{bitmap.ImageSize} not equal {ImageSize}");
         buffer.CopyToCPU(bitmap.Data);
-        return bitmap;
+        return (this as TGpuRen)!;
     }
 
     public TGpuRen Apply()

@@ -38,7 +38,7 @@ public static class GpuRenderableEx
         CheckSizes(th, other);
         CheckAndInitBuffers(th, other);
 
-        Mul(th.GetBuffer()!.IntExtent, th.GetBuffer()!.View, other.GetBuffer()!.View);
+        Mul(other.GetBuffer()!.Extent.ToIntIndex(), th.GetBuffer()!.View, other.GetBuffer()!.View);
 
         return (th as TGpuRen)!;
     }
@@ -55,7 +55,7 @@ public static class GpuRenderableEx
         CheckSizes(th, other);
         CheckAndInitBuffers(th, other);
 
-        Add(th.GetBuffer()!.IntExtent, th.GetBuffer()!.View, other.GetBuffer()!.View);
+        Add(other.GetBuffer()!.Extent.ToIntIndex(), th.GetBuffer()!.View, other.GetBuffer()!.View);
 
         return (th as TGpuRen)!;
     }
@@ -85,7 +85,6 @@ public static class GpuRenderableEx
 
     private static void Mul(Index1D index, ArrayView1D<int, Stride1D.Dense> im1, ArrayView1D<int, Stride1D.Dense> im2)
     {
-        if (index.X >= im1.Length) return;
         var a = Crop(((im1[index] & AMask) >> 12) * ((im2[index] & AMask) >> 12));
         var r = Crop(((im1[index] & RMask) >> 8) * ((im2[index] & RMask) >> 8));
         var g = Crop(((im1[index] & GMask) >> 4) * ((im2[index] & GMask) >> 4));
@@ -96,7 +95,6 @@ public static class GpuRenderableEx
 
     private static void Add(Index1D index, ArrayView1D<int, Stride1D.Dense> im1, ArrayView1D<int, Stride1D.Dense> im2)
     {
-        if (index.X >= im1.Length) return;
         var a = Crop(((im1[index] & AMask) >> 12) + ((im2[index] & AMask) >> 12));
         var r = Crop(((im1[index] & RMask) >> 8) + ((im2[index] & RMask) >> 8));
         var g = Crop(((im1[index] & GMask) >> 4) + ((im2[index] & GMask) >> 4));
