@@ -25,6 +25,7 @@ namespace WpfApp2
         private static bool isStarted;
         private static bool videoInitialized;
         private CancellationTokenSource cts = new();
+        private const string TempFiles = @"C:\Users\Garipov\RiderProjects\ProjectNice\WpfApp2\bin\Debug\net6.0-windows\temp_img";
 
 
         public MainWindow()
@@ -47,9 +48,9 @@ namespace WpfApp2
             };
         }
 
-        private void StartImageUpdater(string path, CancellationToken ct)
+        private void StartImageUpdater(string audioPath, CancellationToken ct)
         {
-            var generator = new VideoGenerator(new WavAudioMonoProvider(16_000), 1280, 720, path);
+            var generator = new VideoGenerator(new WavAudioMonoProvider(16_000), 1280, 720, audioPath, TempFiles);
             var i = 0;
             foreach (var _ in generator.FunnyAnd())
             {
@@ -65,7 +66,7 @@ namespace WpfApp2
                 Dispatcher.Invoke(() =>
                 {
                     var img = new BitmapImage(new Uri(
-                        $@"C:\Users\Garipov\RiderProjects\ProjectNice\WpfApp2\bin\Debug\net6.0-windows\temp_img\{temp}.bmp"));
+                        $@"{TempFiles}\{temp}.bmp"));
                     return ImageViewer1.Source = img;
                 });
                 Thread.Sleep(6);
