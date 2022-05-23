@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Kernel.Services;
 using Microsoft.Win32;
 
 namespace WpfApp2
@@ -48,7 +49,7 @@ namespace WpfApp2
 
         private void StartImageUpdater(string path, CancellationToken ct)
         {
-            var generator = new VideoGenerator(path, 1280, 720);
+            var generator = new VideoGenerator(new WavAudioMonoProvider(16_000), 1280, 720, path);
             var i = 0;
             foreach (var _ in generator.FunnyAnd())
             {
