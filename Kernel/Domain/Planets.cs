@@ -15,23 +15,24 @@ namespace Kernel.Domain
         public readonly int MinSize;
         public readonly int MaxSize;
         public readonly Brush Color;
+        public readonly Random Random;
 
-        public PlanetsSettings(int count, int minSize, int maxSize, Brush color)
+        public PlanetsSettings(int count, int minSize, int maxSize, Brush color, Random random)
         {
             Count = count;
             MinSize = minSize;
             MaxSize = maxSize;
             Color = color;
+            Random = random;
         }
     }
 
     public class Planets : Renderable<Planets, PlanetsSettings>
     {
-        public List<Planet> PlanetsList = new();
+        private List<Planet> PlanetsList = new();
         float sumMass;
         float xMass;
         float yMass;
-        public float speed;
 
         public Planets(int width, int height) : base(width, height)
         {
@@ -42,9 +43,9 @@ namespace Kernel.Domain
             var bmp = new DirectBitmap(Width, Height);
             if (PlanetsList.Count == 0)
             {
-                var r = new Random();
+                var r = Settings.Random;
                 PlanetsList = Enumerable
-                    .Range(0, Settings.Count - 1)
+                    .Range(0, Settings.Count)
                     .Select(x => new Planet(
                         r.Next(0, Width),
                         r.Next(0, Height),
@@ -56,16 +57,12 @@ namespace Kernel.Domain
 
                 xMass = Width / 2;
                 yMass = Height / 2;
-
-                var xMassD = PlanetsList.Sum(x => x.Position.X * x.size) / sumMass - xMass;
-                var yMassD = PlanetsList.Sum(y => y.Position.Y * y.size) / sumMass - yMass;
-
-                PlanetsList = PlanetsList.Select(x =>
-                    new Planet(x.Position.X - xMassD, x.Position.Y - yMassD, x.size, x.Speed.X, x.Speed.Y)).ToList();
-                PlanetsList.Add(new Planet(xMass, yMass, Settings.MaxSize, 0, 0));
+            }
+            else
+            {
+                ApplyGravity();
             }
 
-            ApplyGravity();
             var g = Graphics.FromImage(bmp.Bitmap);
             foreach (var planet in PlanetsList)
             {
@@ -76,11 +73,11 @@ namespace Kernel.Domain
             return bmp;
         }
 
-        public void ApplyGravity()
+        private void ApplyGravity()
         {
             foreach (var planet in PlanetsList)
             {
-                planet.Position += planet.Speed * speed;
+                planet.Position += planet.Speed;
                 foreach (var other in PlanetsList)
                 {
                     if (planet == other) continue;
@@ -89,7 +86,7 @@ namespace Kernel.Domain
                     var scalarF = -(planet.size * other.size) / (r21length * r21length + planet.size);
                     var r21cup = r21 / (r21length + planet.size);
                     var vectorF = scalarF * r21cup;
-                    planet.Speed = planet.Speed + (1.3f + speed) * vectorF / (planet.size);
+                    planet.Speed = planet.Speed + (4f) * vectorF / (planet.size);
                 }
 
                 if (planet.Position.X < 0)
