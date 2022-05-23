@@ -19,12 +19,13 @@ public class VideoGenerator
 
     private string TempFilesPath;
 
-    public VideoGenerator(IWavAudioProvider audioProvider, int width, int height, string audioPath, string tempFilesPath)
+    public VideoGenerator(IWavAudioProvider audioProvider, int width, int height, string audioPath,
+        string tempFilesPath)
     {
         TempFilesPath = tempFilesPath;
-        if(!Directory.Exists(TempFilesPath))
+        if (!Directory.Exists(TempFilesPath))
             Directory.CreateDirectory(TempFilesPath);
-            
+
         this.audioProvider = audioProvider;
         this.width = width;
         this.height = height;
@@ -61,13 +62,13 @@ public class VideoGenerator
     public IEnumerable<int> FunnyAnd()
     {
         var fft = new FFTGenerator(audioProvider).GetFFT(audioPath);
-        var funny = new Funny(width, height).Config(new FunnySettings(fft));
-        var anim2 = new Planets(width, height).Config(new PlanetsSettings(20, 10, 100, Brushes.Aqua, new Random()));
-        var added = ImageBase.Create()
-            .Config(new ImageSettings(width, height))
-            .Add<Funny>(f => f.Config(new FunnySettings(fft)))
-            .Add<Planets>(p => p.Config(new PlanetsSettings(20, 10, 100, Brushes.Azure, new Random())))
-            .Add<Constant>(c => c.Config(new ConstantSettings(Color.Brown)));
+        var added =
+            ImageBase.Create()
+                .Config(new ImageSettings(width, height))
+                .Add<Funny>(f => f.Config(new FunnySettings(fft)))
+                .Add<ThreeD>(f => f.Config(new ThreeDSettings(fft)))
+                .Add<Mandelbrot>(f => f.Config(new MandelbrotSettings(2d, 0, 0, width, height)))
+                .Add<Constant>(c => c.Config(new ConstantSettings(Color.Brown)));
         for (int i = 0; i < fft.Count; i++)
         {
             var bmp = added.GetBitmap();

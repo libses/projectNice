@@ -50,7 +50,7 @@ namespace WpfApp2
 
         private void StartImageUpdater(string audioPath, CancellationToken ct)
         {
-            var generator = new VideoGenerator(new WavAudioMonoProvider(16_000), 1280, 720, audioPath, TempFiles);
+            var generator = new VideoGenerator(new WavAudioMonoProvider(16000), 600, 400, audioPath, TempFiles);
             var i = 0;
             foreach (var _ in generator.FunnyAnd())
             {
@@ -69,7 +69,7 @@ namespace WpfApp2
                         $@"{TempFiles}\{temp}.bmp"));
                     return ImageViewer1.Source = img;
                 });
-                Thread.Sleep(6);
+               // Thread.Sleep(6);
             }
         }
 
