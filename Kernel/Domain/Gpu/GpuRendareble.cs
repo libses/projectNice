@@ -42,7 +42,7 @@ public abstract class GpuRenderable<TGpuRen, TSettings> : IGpuRenderable<TGpuRen
 
     public TGpuRen Apply()
     {
-        buffer ??= GpuSingleton.Gpu.Allocate1D<int>(ImageSize.Height * ImageSize.Height);
+        buffer ??= GpuSingleton.Gpu.Allocate1D<int>(ImageSize.Width * ImageSize.Height);
         Kernel(buffer.IntExtent, Settings, buffer.View);
         return (this as TGpuRen)!;
     }
