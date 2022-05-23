@@ -8,7 +8,7 @@ namespace Kernel.Domain.Gpu;
 
 public abstract class GpuRenderable<TGpuRen, TSettings> : IGpuRenderable<TGpuRen, TSettings>, IDisposable
     where TGpuRen : class, IGpuRenderable<TGpuRen, TSettings>
-    where TSettings : unmanaged
+    where TSettings : struct
 {
 
     protected GpuRenderable(Size imageSize, Action<Index1D, TSettings, ArrayView1D<int, Dense>> kernel)

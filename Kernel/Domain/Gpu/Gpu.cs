@@ -9,7 +9,17 @@ public static class GpuSingleton
 
     static GpuSingleton()
     {
-        var context = Context.CreateDefault();
-        Gpu = context.GetPreferredDevice(false).CreateAccelerator(context);
+        var context = Context.Create()
+            .EnableAlgorithms()
+            .Math(MathMode.Fast)
+            .AllAccelerators();
+#if RELEASE
+        Gpu = context.ToContext().GetPreferredDevice(false).CreateAccelerator(context.ToContext());
+#endif
+#if DEBUG
+        context.Debug();
+        Gpu = context.ToContext().Devices.First(d => d.AcceleratorType == AcceleratorType.CPU)
+            .CreateAccelerator(context.ToContext());
+#endif
     }
 }

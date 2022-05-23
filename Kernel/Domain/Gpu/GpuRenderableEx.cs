@@ -32,8 +32,8 @@ public static class GpuRenderableEx
             IGpuRenderable<TGpuRenOther, TSettingsOther> other)
         where TGpuRenOther : IGpuRenderable<TGpuRenOther, TSettingsOther>
         where TGpuRen : class, IGpuRenderable<TGpuRen, TSettings>
-        where TSettingsOther : unmanaged
-        where TSettings : unmanaged
+        where TSettingsOther : struct
+        where TSettings : struct
     {
         CheckSizes(th, other);
         CheckAndInitBuffers(th, other);
@@ -49,8 +49,8 @@ public static class GpuRenderableEx
             IGpuRenderable<TGpuRenOther, TSettingsOther> other)
         where TGpuRenOther : IGpuRenderable<TGpuRenOther, TSettingsOther>
         where TGpuRen : class, IGpuRenderable<TGpuRen, TSettings>
-        where TSettingsOther : unmanaged
-        where TSettings : unmanaged
+        where TSettingsOther : struct
+        where TSettings : struct
     {
         CheckSizes(th, other);
         CheckAndInitBuffers(th, other);
@@ -63,9 +63,9 @@ public static class GpuRenderableEx
     private static void CheckSizes<TGpuRen, TSettings, TGpuRenOther, TSettingsOther>(
         IGpuRenderable<TGpuRen, TSettings> th, IGpuRenderable<TGpuRenOther, TSettingsOther> other)
         where TGpuRen : class, IGpuRenderable<TGpuRen, TSettings>
-        where TSettings : unmanaged
+        where TSettings : struct
         where TGpuRenOther : IGpuRenderable<TGpuRenOther, TSettingsOther>
-        where TSettingsOther : unmanaged
+        where TSettingsOther : struct
     {
         if (th.ImageSize != other.ImageSize)
             throw new InvalidOperationException($"{th.ImageSize} not equal {other.ImageSize}");
@@ -76,8 +76,8 @@ public static class GpuRenderableEx
             IGpuRenderable<TGpuRenOther, TSettingsOther> other)
         where TGpuRenOther : IGpuRenderable<TGpuRenOther, TSettingsOther>
         where TGpuRen : class, IGpuRenderable<TGpuRen, TSettings>
-        where TSettingsOther : unmanaged
-        where TSettings : unmanaged
+        where TSettingsOther : struct
+        where TSettings : struct
     {
         if (th.GetBuffer() is null) th.Apply();
         if (other.GetBuffer() is null) other.Apply();
@@ -85,6 +85,7 @@ public static class GpuRenderableEx
 
     private static void Mul(Index1D index, ArrayView1D<int, Stride1D.Dense> im1, ArrayView1D<int, Stride1D.Dense> im2)
     {
+        if (index.X >= im1.Length) return;
         var a = Crop(((im1[index] & AMask) >> 12) * ((im2[index] & AMask) >> 12));
         var r = Crop(((im1[index] & RMask) >> 8) * ((im2[index] & RMask) >> 8));
         var g = Crop(((im1[index] & GMask) >> 4) * ((im2[index] & GMask) >> 4));
@@ -95,6 +96,7 @@ public static class GpuRenderableEx
 
     private static void Add(Index1D index, ArrayView1D<int, Stride1D.Dense> im1, ArrayView1D<int, Stride1D.Dense> im2)
     {
+        if (index.X >= im1.Length) return;
         var a = Crop(((im1[index] & AMask) >> 12) + ((im2[index] & AMask) >> 12));
         var r = Crop(((im1[index] & RMask) >> 8) + ((im2[index] & RMask) >> 8));
         var g = Crop(((im1[index] & GMask) >> 4) + ((im2[index] & GMask) >> 4));
@@ -104,7 +106,7 @@ public static class GpuRenderableEx
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static int Crop(long l)
+    internal static int Crop(long l)
     {
         if (l < 0) return 0;
         return l > 255 ? 255 : (int) l;

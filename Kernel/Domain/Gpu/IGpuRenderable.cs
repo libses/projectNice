@@ -7,9 +7,8 @@ namespace Kernel.Domain.Gpu;
 
 public interface IGpuRenderable<TGpuRen, TSettings>
     where TGpuRen : IGpuRenderable<TGpuRen, TSettings>
-    where TSettings : unmanaged
+    where TSettings : struct
 {
-    Action<Index1D, TSettings, ArrayView1D<int, Stride1D.Dense>>? Kernel { get; }
     Size ImageSize { get; }
     TSettings Settings { get; set; }
     MemoryBuffer1D<int, Stride1D.Dense>? GetBuffer();

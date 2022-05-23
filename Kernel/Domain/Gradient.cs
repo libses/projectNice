@@ -3,8 +3,6 @@ using System.Numerics;
 using ILGPU;
 using ILGPU.Runtime;
 using Kernel.Domain.Gpu;
-using Kernel.Domain.Settings;
-using Kernel.Domain.Utils;
 
 namespace Kernel.Domain
 {
@@ -21,13 +19,15 @@ namespace Kernel.Domain
             var dy = y / 256d;
 
             var complex = new Complex(dx, dy);
-            var res = (2 * complex.Phase / Math.PI).ToInt();
 
-            buffer[index] = res;
+            var res = 2 * complex.Phase / MathF.PI;
+
+            buffer[index] = GpuRenderableEx.Crop((int) res * 255);
         }
 
         public Gradient(int width, int height) : base(new Size(width, height), ComputeFromGpu)
         {
+            Settings = ImageSize;
         }
     }
 }
