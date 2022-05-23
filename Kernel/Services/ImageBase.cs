@@ -6,8 +6,8 @@ namespace Kernel.Services;
 
 public class ImageBase : Configurer<ImageSettings>
 {
-    private readonly List<(Type, Action<DirectBitmap, DirectBitmap>, Delegate)> items;
-    
+    private readonly List<(Type type, Action<DirectBitmap, DirectBitmap> action, Delegate getter)> items;
+
     private ImageBase()
     {
         items = new List<(Type, Action<DirectBitmap, DirectBitmap>, Delegate)>();
@@ -23,7 +23,7 @@ public class ImageBase : Configurer<ImageSettings>
     }
 
     public ImageBase Add<TRenderable>(Func<TRenderable, TRenderable> renderable)
-    where TRenderable : IRenderable
+        where TRenderable : IRenderable
     {
         items.Add(
             (typeof(TRenderable),
@@ -35,7 +35,7 @@ public class ImageBase : Configurer<ImageSettings>
 
 
     public ImageBase Multiply<TRenderable>(Func<TRenderable, TRenderable> renderable)
-    where TRenderable : IRenderable
+        where TRenderable : IRenderable
     {
         items.Add(
             (typeof(TRenderable),

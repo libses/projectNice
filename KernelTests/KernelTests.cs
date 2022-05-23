@@ -1,19 +1,14 @@
-﻿using FakeItEasy;
-using FluentAssertions;
-using Kernel;
+﻿using Kernel;
 using Kernel.Domain;
 using Kernel.Domain.Settings;
 using Kernel.Domain.Utils;
 using Kernel.Services;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Kernel.Services.Interfaces;
 
 namespace KernelTests
 {
+    [TestFixture]
     public class PlanetsShould
     {
         [Test]
@@ -47,6 +42,7 @@ namespace KernelTests
         }
     }
 
+    [TestFixture]
     public class RandomShould
     {
         [Test]
@@ -59,6 +55,7 @@ namespace KernelTests
         }
     }
 
+    [TestFixture]
     public class ConstantShould
     {
         [Test]
@@ -76,6 +73,7 @@ namespace KernelTests
         }
     }
 
+    [TestFixture]
     public class OperatorsShould
     {
         [Test]
@@ -109,6 +107,7 @@ namespace KernelTests
         }
     }
 
+    [TestFixture]
     public class KernelBuilderTests
     {
         [Test]
@@ -119,6 +118,7 @@ namespace KernelTests
         }
     }
 
+    [TestFixture]
     public class BitmapExtensionsTests
     {
         [Test]
@@ -127,12 +127,13 @@ namespace KernelTests
             var f = new Constant(100, 100).Config(new ConstantSettings(Color.FromArgb(123, 123, 123)));
             f.GetBitmap().Bitmap.SaveJPG100("aboba.jpg");
             var bmp = Bitmap.FromFile("aboba.jpg");
-            ((Bitmap)bmp).GetPixel(0, 0).Should().Be(Color.FromArgb(123, 123, 123));
+            ((Bitmap) bmp).GetPixel(0, 0).Should().Be(Color.FromArgb(123, 123, 123));
             bmp.Dispose();
             File.Delete("aboba.jpg");
         }
     }
 
+    [TestFixture]
     public class BitmapProviderTests
     {
         [Test]
@@ -155,15 +156,32 @@ namespace KernelTests
         }
     }
 
+    [TestFixture]
     public class FunnyTests
     {
         [Test]
         public void TestFunnyEmptyFft()
         {
             var doubles = new double[100];
-            var doublesList = new List<double[]> { doubles };
+            var doublesList = new List<double[]> {doubles};
             var funny = new Funny(100, 100).Config(new FunnySettings(doublesList));
             funny.GetBitmap().GetPixel(0, 0).Should().Be(Color.FromArgb(0, 0, 0, 0));
+        }
+    }
+
+    [TestFixture]
+    public class FFTGeneratorTests
+    {
+        [Test]
+        public void GetFFTShouldUseIWavAudioProvider()
+        {
+            var filename = "aboba.wav";
+            var provider = A.Fake<IWavAudioProvider>();
+            var generator = new FFTGenerator(provider);
+
+            generator.GetFFT(filename);
+
+            A.CallTo(() => provider.ReadWav(filename)).MustHaveHappenedOnceExactly();
         }
     }
 }
