@@ -6,8 +6,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using Domain;
-using Domain.Render;
+using Kernel.Domain;
 using Microsoft.Win32;
 using Image = System.Windows.Controls.Image;
 
@@ -28,31 +27,9 @@ namespace WpfApp2
         public MainWindow()
         {
             InitializeComponent();
-            var i = 1d;
-            var bmp =
-                ImageBase.Create()
-                    .Config(new ImageSettings(1500, 1500))
-                    .Add<Mandelbrot>(m => m.Config(new MandelbrotSettings(i, 0.311, 0.482, 1500, 1500)))
-                    //.Multiply<Gradient>(g => g)
-                    .GetBitmap();
 
-            ImageViewer1.Source = BitmapToImageSource(bmp);
             PlayBtn.Click += (_, _) => mediaPlayer.Play();
             PauseBtn.Click += (_, _) => mediaPlayer.Pause();
-        }
-
-        static BitmapImage BitmapToImageSource(DirectBitmap bitmap)
-        {
-            using MemoryStream memory = new MemoryStream();
-            bitmap.Bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
-            memory.Position = 0;
-            BitmapImage bitmapimage = new BitmapImage();
-            bitmapimage.BeginInit();
-            bitmapimage.StreamSource = memory;
-            bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
-            bitmapimage.EndInit();
-
-            return bitmapimage;
         }
 
         private MediaPlayer mediaPlayer = new MediaPlayer();

@@ -19,7 +19,7 @@ public class DirectBitmap : IDisposable
         {
             data = value;
             BitsHandle = GCHandle.Alloc(Data, GCHandleType.Pinned);
-            Bitmap = new Bitmap(Width, Height, Width * 4, PixelFormat.Format32bppRgb, BitsHandle.AddrOfPinnedObject());
+            Bitmap = new Bitmap(Width, Height, Width * 4, PixelFormat.Format32bppArgb, BitsHandle.AddrOfPinnedObject());
         }
     }
 
@@ -48,7 +48,7 @@ public class DirectBitmap : IDisposable
         int index = x + (y * Width);
         int col = colour.ToArgb();
 
-        Data[index] = (byte)col;
+        Data[index] = col;
     }
 
     public Color GetPixel(int x, int y)

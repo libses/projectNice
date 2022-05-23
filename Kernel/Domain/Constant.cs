@@ -9,7 +9,10 @@ namespace Kernel.Domain
         public override DirectBitmap GetBitmap()
         {
             var bmp = new DirectBitmap(Width, Height);
-            Graphics.FromImage(bmp.Bitmap).Clear(Settings.Color);
+            for (int i = 0; i < bmp.Data.Length; i++)
+            {
+                bmp.Data[i] = ((Color)Settings.Color).ToArgb();
+            }
 
             return bmp;
         }

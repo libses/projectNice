@@ -1,4 +1,7 @@
 using FluentAssertions;
+using Kernel;
+using Kernel.Domain;
+using Kernel.Services;
 
 namespace KernelTests;
 
@@ -10,9 +13,9 @@ public class Tests
     }
 
     [Test]
-    public void Test1()
+    public void Test2()
     {
-        const string joke = "i am c# developer";
-        joke.Should().Be("i love penis");
+        var k = new Pixel(1, 1, 1, 1);
+        k.Should().Be(new Pixel(1, 1, 1, 1));
     }
 }
