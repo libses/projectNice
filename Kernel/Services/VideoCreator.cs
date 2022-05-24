@@ -16,7 +16,6 @@ public class VideoCreator
     public VideoCreator(VideoEncoderSettings settings)
     {
         this.settings = settings;
-        FFmpegLoader.FFmpegPath = @"C:\ff\bin";
     }
     
     public void Create(IEnumerable<Bitmap> bitmaps, string filename)
