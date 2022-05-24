@@ -7,6 +7,8 @@ namespace Kernel.Services;
 public class ImageBase : Configurer<ImageSettings>
 {
     private readonly List<(Type type, Action<DirectBitmap, DirectBitmap> action, Delegate getter)> items;
+    private bool isFirstTime = true;
+    private readonly List<IRenderable> renderables = new List<IRenderable>();
 
     private ImageBase()
     {
@@ -48,15 +50,30 @@ public class ImageBase : Configurer<ImageSettings>
     public DirectBitmap GetBitmap()
     {
         var baseBitmap = new DirectBitmap(Settings.Width, Settings.Height);
-        foreach (var (type, action, getter) in items)
+        if (isFirstTime)
         {
-            var obj = type
-                .GetConstructor(new[] {typeof(int), typeof(int)})?.Invoke(new[]
-                {
+            foreach (var (type, action, getter) in items)
+            {
+                var obj = type
+                    .GetConstructor(new[] { typeof(int), typeof(int) })?.Invoke(new[]
+                    {
                     Settings.Width, (object) Settings.Height
-                });
-            var renderable = getter.DynamicInvoke(obj) as IRenderable;
-            action(baseBitmap, renderable.GetBitmap());
+                    });
+                var renderable = getter.DynamicInvoke(obj) as IRenderable;
+                renderables.Add(renderable);
+                action(baseBitmap, renderable.GetBitmap());
+            }
+
+            isFirstTime = false;
+        }
+        else
+        {
+            for (int i = 0; i < renderables.Count; i++)
+            {
+                var renderable = renderables[i];
+                var action = items[i].action;
+                action(baseBitmap, renderable.GetBitmap());
+            }
         }
 
         return baseBitmap;

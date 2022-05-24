@@ -16,7 +16,7 @@ namespace KernelTests
         {
             var r = A.Fake<Random>();
             A.CallTo(() => r.Next(0, 10)).WithAnyArguments().Returns(5);
-            var planets = new Planets(100, 100).Config(new PlanetsSettings(1, 0, 10, Brushes.White, r));
+            var planets = new Planets(100, 100).Config(new PlanetsSettings(1, 0, 10, r));
             var bmp = planets.GetBitmap();
             bmp.GetPixel(5, 5).Should().Be(Color.FromArgb(255, 255, 255));
             bmp.GetPixel(0, 0).Should().NotBe(Color.FromArgb(255, 255, 255));
@@ -27,7 +27,7 @@ namespace KernelTests
         {
             var r = A.Fake<Random>();
             A.CallTo(() => r.Next(0, 10)).WithAnyArguments().ReturnsNextFromSequence(75, 50, 10, 25, 50, 10);
-            var planets = new Planets(100, 100).Config(new PlanetsSettings(2, 0, 10, Brushes.White, r));
+            var planets = new Planets(100, 100).Config(new PlanetsSettings(2, 0, 10, r));
             var bmp = planets.GetBitmap();
             bmp.GetPixel(79, 50).Should().Be(Color.FromArgb(255, 255, 255));
             bmp.GetPixel(21, 50).Should().Be(Color.FromArgb(255, 255, 255));
