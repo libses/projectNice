@@ -52,6 +52,28 @@ public abstract class GpuRenderable<TGpuRen, TSettings> : IGpuRenderable<TGpuRen
         return (this as TGpuRen)!;
     }
 
+    public TGpuRen Add<TGpuRenOther, TSettingsOther>(GpuRenderable<TGpuRenOther, TSettingsOther> other)
+        where TSettingsOther : struct where TGpuRenOther : class, IGpuRenderable<TGpuRenOther, TSettingsOther>
+    {
+        if (buffer is null) Apply();
+        if (other.buffer is null) other.Apply();
+
+        GpuOperations.AddKernel(buffer!.IntExtent, buffer.View, other.buffer!.View);
+
+        return (this as TGpuRen)!;
+    }
+    
+    public TGpuRen Multiply<TGpuRenOther, TSettingsOther>(GpuRenderable<TGpuRenOther, TSettingsOther> other)
+        where TSettingsOther : struct where TGpuRenOther : class, IGpuRenderable<TGpuRenOther, TSettingsOther>
+    {
+        if (buffer is null) Apply();
+        if (other.buffer is null) other.Apply();
+
+        GpuOperations.MulKernel(buffer!.IntExtent, buffer.View, other.buffer!.View);
+
+        return (this as TGpuRen)!;
+    }
+
     public void Dispose()
     {
         buffer?.Dispose();

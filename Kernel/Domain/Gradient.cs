@@ -22,7 +22,7 @@ namespace Kernel.Domain
 
             var res = 2 * complex.Phase / MathF.PI;
 
-            buffer[index] = GpuRenderableEx.Crop((int) res * 255);
+            buffer[index] = GpuOperations.Crop((int) res * 255);
         }
 
         public Gradient(int width, int height) : base(new Size(width, height), ComputeFromGpu)

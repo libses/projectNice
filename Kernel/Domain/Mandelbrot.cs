@@ -37,7 +37,7 @@ namespace Kernel.Domain
             MandelbrotSettings settings,
             ArrayView1D<Int32, Stride1D.Dense> buffer)
         {
-            var z =Complex.Zero;
+            var z = Complex.Zero;
             var xxW = index.X % settings.Width / (double) settings.Width;
             var yyW = index.X / settings.Width / (double) settings.Height;
             var c = new Complex((xxW - 0.5) * settings.Scale + settings.A,

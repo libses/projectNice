@@ -10,6 +10,7 @@ using FFMediaToolkit.Encoding;
 using FFMediaToolkit.Graphics;
 using Kernel.Domain;
 using Kernel.Domain.Gpu;
+using Kernel.Domain.Settings;
 using Kernel.Domain.Utils;
 using NAudio.Wave;
 using Spectrogram;
@@ -152,9 +153,9 @@ namespace ConsoleApp
             if (!Directory.Exists("./temp"))
                 Directory.CreateDirectory("./temp");
             var bmp = mandel.WithSettings(new MandelbrotSettings(1d, -0.74529, 0.113075, x, y))
-                .Multiply(new Gradient(1280, 720))
+                 .Multiply(new Constant(x,y).WithSettings(new (new Random().Next())))
                 .ToBitmap().Bitmap;
-            bmp.SaveJPG100($"temp/0.jpg");
+            bmp.SaveJPG100($"qwer.jpg");
             // var counter = 0;
             // for (var i = 1d * 0.99; i > 0.0001d; i *= 0.99)
             // {
