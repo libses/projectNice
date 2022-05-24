@@ -62,7 +62,7 @@ namespace Kernel.Domain
             g.FillClosedCurve(Brushes.Gray, vectors.Select(x => new PointF(x.X, x.Y)).ToArray());
             foreach (var v in fullVectors)
             {
-                g.DrawLine(new Pen(Color.White, 0.5f), v.X, v.Y, Width / 2, Height / 2);
+                g.DrawLine(new Pen(Color.White, 0.2f), v.X, v.Y, Width / 2, Height / 2);
             }
 
             foreach (var v in vectors)
