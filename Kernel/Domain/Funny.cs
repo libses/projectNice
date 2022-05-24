@@ -18,17 +18,7 @@ namespace Kernel.Domain
         }
         
 
-        public override DirectBitmap GetBitmap()
-        {
-            return Process(new DirectBitmap(Width, Height));
-        }
-
-        public override DirectBitmap Update(DirectBitmap bitmap)
-        {
-            return Process(bitmap);
-        }
-
-        private DirectBitmap Process(DirectBitmap bmp)
+        protected override DirectBitmap Process(DirectBitmap bmp)
         {
             var n = Settings.Fft[0].Length;
             var discrete = Settings.Fft[0].Length / n;

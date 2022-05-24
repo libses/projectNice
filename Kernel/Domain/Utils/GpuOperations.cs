@@ -30,9 +30,9 @@ public static class GpuOperations
 
     private static void Mul(Index1D index, ArrayView1D<int, Stride1D.Dense> im1, ArrayView1D<int, Stride1D.Dense> im2)
     {
-        var a = Crop(((im1[index] & AMask) >> 24) * ((im2[index] & AMask) >> 12) / 100);
-        var r = Crop(((im1[index] & RMask) >> 16) * ((im2[index] & RMask) >> 8) / 100);
-        var g = Crop(((im1[index] & GMask) >> 8) * ((im2[index] & GMask) >> 4) / 100);
+        var a = Crop(((im1[index] & AMask) >> 24) * ((im2[index] & AMask) >> 24));
+        var r = Crop(((im1[index] & RMask) >> 16) * ((im2[index] & RMask) >> 16) );
+        var g = Crop(((im1[index] & GMask) >> 8) * ((im2[index] & GMask) >> 8) );
         var b = Crop((im1[index] & BMask) * (im2[index] & BMask));
 
         im1[index] = (a << 24) | (r << 16) | (g << 8) | b;
@@ -40,9 +40,9 @@ public static class GpuOperations
 
     private static void Add(Index1D index, ArrayView1D<int, Stride1D.Dense> im1, ArrayView1D<int, Stride1D.Dense> im2)
     {
-        var a = Crop(((im1[index] & AMask) >> 24) + ((im2[index] & AMask) >> 12) / 100);
-        var r = Crop(((im1[index] & RMask) >> 16) + ((im2[index] & RMask) >> 8) / 100);
-        var g = Crop(((im1[index] & GMask) >> 8) + ((im2[index] & GMask) >> 4) / 100);
+        var a = Crop(((im1[index] & AMask) >> 24) + ((im2[index] & AMask) >> 24));
+        var r = Crop(((im1[index] & RMask) >> 16) + ((im2[index] & RMask) >> 16) );
+        var g = Crop(((im1[index] & GMask) >> 8) + ((im2[index] & GMask) >> 8));
         var b = Crop((im1[index] & BMask) + (im2[index] & BMask));
 
         im1[index] = (a << 24) | (r << 16) | (g << 8) | b;

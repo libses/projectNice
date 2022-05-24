@@ -10,9 +10,25 @@ namespace Kernel.Domain.Utils;
 
 public class DirectBitmap : Combinable<DirectBitmap>, IDisposable
 {
-    public Bitmap Bitmap { get; private set; }
+    private Bitmap bitmap;
+
+    public Bitmap Bitmap
+    {
+        get
+        {
+            if (buffer is not null && !buffer.IsDisposed)
+            {
+                buffer.CopyToCPU(Data);
+                buffer.Dispose();
+            }
+
+            return bitmap;
+        }
+        private set => bitmap = value;
+    }
 
     private Int32[] data;
+    private MemoryBuffer1D<int, Stride1D.Dense>? buffer;
 
     public Int32[] Data
     {
@@ -61,7 +77,7 @@ public class DirectBitmap : Combinable<DirectBitmap>, IDisposable
         int col = Data[index];
         Color result = Color.FromArgb(col);
 
-        return result;
+        return Bitmap.GetPixel(x, y);
     }
 
     public void Dispose()
@@ -74,7 +90,12 @@ public class DirectBitmap : Combinable<DirectBitmap>, IDisposable
 
     protected override MemoryBuffer1D<int, Stride1D.Dense> GetBuffer()
     {
-        return Gpu.GpuSingleton.Gpu.Allocate1D(Data);
+        if (buffer is null || buffer.IsDisposed)
+        {
+            buffer = Gpu.GpuSingleton.Gpu.Allocate1D(Data);
+        }
+
+        return buffer;
     }
 
     public override DirectBitmap GetBitmap()
