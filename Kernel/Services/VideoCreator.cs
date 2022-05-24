@@ -38,14 +38,13 @@ public class VideoCreator
         }
     }
 
-    public void CreateWithSound(IEnumerable<Bitmap> bitmaps, string filename, IWavAudioProvider provider, string audioPath)
+    public void CreateWithSound(IEnumerable<Bitmap> bitmaps, string filename, string audioPath)
     {
         var mf = MediaFile.Open(audioPath);
         var aes = new AudioEncoderSettings(mf.Audio.Info.SampleRate, mf.Audio.Info.NumChannels, AudioCodec.MP3);
         aes.SampleFormat = mf.Audio.Info.SampleFormat;
         aes.SamplesPerFrame = mf.Audio.Info.SamplesPerFrame;
         aes.Bitrate = (int)mf.Info.Bitrate;
-        var codec = mf.Audio.Info.CodecName;
         using var file = MediaBuilder
             .CreateContainer(filename)
             .WithAudio(aes)

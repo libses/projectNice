@@ -27,7 +27,7 @@ namespace ConsoleApp
             var provider = new BitmapProvider("temp", "jpg", fft.Count);
             var v = new VideoCreator(new VideoEncoderSettings(x, y, 44, VideoCodec.H265));
             //v.Create(provider.Get(), "C:\\videos\\example.mp4");
-            v.CreateWithSound(provider.Get(), "C:\\videos\\example.mp4", new WavAudioMonoProvider(16000), "606.mp3");
+            v.CreateWithSound(provider.Get(), "C:\\videos\\example.mp4", "606.mp3");
         }
     }
 }
