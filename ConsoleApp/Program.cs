@@ -17,6 +17,7 @@ namespace ConsoleApp
             var threeD = new ThreeD(x, y).Config(new ThreeDSettings(fft));
             var bmp = threeD.GetBitmap();
             bmp.Bitmap.SaveJPG100("temp\\0.jpg");
+            var funny = new Funny(x, y).Config(new Kernel.Domain.Settings.FunnySettings(fft));
             for (int i = 1; i < fft.Count; i++)
             {
                 threeD.GetBitmapU(bmp);

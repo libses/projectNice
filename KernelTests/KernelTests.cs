@@ -43,19 +43,6 @@ namespace KernelTests
     }
 
     [TestFixture]
-    public class RandomShould
-    {
-        [Test]
-        public void TestRandomInit()
-        {
-            var r = A.Fake<Random>();
-            A.CallTo(() => r.Next(0, 0)).WithAnyArguments().Returns(100);
-            var rand = new RandomG(100, 100).Config(new RandomSettings(0, 0, r));
-            rand.GetBitmap().GetPixel(0, 0).Should().Be(Color.FromArgb(100, 100, 100));
-        }
-    }
-
-    [TestFixture]
     public class ConstantShould
     {
         [Test]
