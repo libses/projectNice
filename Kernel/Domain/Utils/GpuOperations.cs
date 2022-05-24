@@ -1,8 +1,9 @@
 ﻿using System.Runtime.CompilerServices;
 using ILGPU;
 using ILGPU.Runtime;
+using Kernel.Domain.Gpu;
 
-namespace Kernel.Domain.Gpu;
+namespace Kernel.Domain.Utils;
 
 public static class GpuOperations
 {

@@ -3,6 +3,7 @@ using System.Numerics;
 using ILGPU;
 using ILGPU.Runtime;
 using Kernel.Domain.Gpu;
+using Kernel.Domain.Utils;
 
 namespace Kernel.Domain
 {

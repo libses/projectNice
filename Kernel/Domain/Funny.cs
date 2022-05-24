@@ -1,11 +1,13 @@
 ﻿using System.Drawing;
 using System.Numerics;
+using ILGPU;
+using ILGPU.Runtime;
 using Kernel.Domain.Settings;
 using Kernel.Domain.Utils;
 
 namespace Kernel.Domain
 {
-    public class Funny : Renderable<Funny, FunnySettings>
+    public class Funny : CpuRenderable<Funny, FunnySettings>
     {
         bool isGenerated = false;
         int i = 0;
@@ -14,8 +16,19 @@ namespace Kernel.Domain
         public Funny(int width, int height) : base(width, height)
         {
         }
+        
 
         public override DirectBitmap GetBitmap()
+        {
+            return Process(new DirectBitmap(Width, Height));
+        }
+
+        public override DirectBitmap Update(DirectBitmap bitmap)
+        {
+            return Process(bitmap);
+        }
+
+        private DirectBitmap Process(DirectBitmap bmp)
         {
             var n = Settings.Fft[0].Length;
             var discrete = Settings.Fft[0].Length / n;
@@ -53,11 +66,12 @@ namespace Kernel.Domain
             var fullVectors = new Vector2[n];
             for (int j = 0; j < n; j++)
             {
-                vectors[j] = new Vector2(Width / 2, Height / 2) + (float)rads[j] * new Vector2((float)Math.Cos(angles[j]), (float)Math.Sin(angles[j]));
-                fullVectors[j] = new Vector2(Width / 2, Height / 2) + r * new Vector2((float)Math.Cos(angles[j]), (float)Math.Sin(angles[j]));
+                vectors[j] = new Vector2(Width / 2, Height / 2) + (float) rads[j] *
+                    new Vector2((float) Math.Cos(angles[j]), (float) Math.Sin(angles[j]));
+                fullVectors[j] = new Vector2(Width / 2, Height / 2) +
+                                 r * new Vector2((float) Math.Cos(angles[j]), (float) Math.Sin(angles[j]));
             }
 
-            var bmp = new DirectBitmap(Width, Height);
             var g = Graphics.FromImage(bmp.Bitmap);
             g.FillClosedCurve(Brushes.Gray, vectors.Select(x => new PointF(x.X, x.Y)).ToArray());
             foreach (var v in fullVectors)

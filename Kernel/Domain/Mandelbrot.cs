@@ -27,7 +27,6 @@ namespace Kernel.Domain
 
     [SuppressMessage("ReSharper", "PossibleLossOfFraction")]
     public class Mandelbrot : GpuRenderable<Mandelbrot, MandelbrotSettings>
-        /*Renderable<Mandelbrot, MandelbrotSettings>,*/
     {
         public Mandelbrot(int width, int height) : base(new Size(width, height), ComputeFromGpu)
         {

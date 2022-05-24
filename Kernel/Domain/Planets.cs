@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
+﻿using System.Drawing;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 using Kernel.Domain.Utils;
 
 namespace Kernel.Domain
@@ -27,7 +22,7 @@ namespace Kernel.Domain
         }
     }
 
-    public class Planets : Renderable<Planets, PlanetsSettings>
+    public class Planets : CpuRenderable<Planets, PlanetsSettings>
     {
         private List<Planet> PlanetsList = new();
         float sumMass;
@@ -41,6 +36,17 @@ namespace Kernel.Domain
         public override DirectBitmap GetBitmap()
         {
             var bmp = new DirectBitmap(Width, Height);
+            return Process(bmp);
+        }
+
+
+        public override DirectBitmap Update(DirectBitmap bitmap)
+        {
+            return Process(bitmap);
+        }
+
+        private DirectBitmap Process(DirectBitmap bmp)
+        {
             if (PlanetsList.Count == 0)
             {
                 var r = Settings.Random;

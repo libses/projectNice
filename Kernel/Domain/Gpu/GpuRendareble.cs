@@ -7,8 +7,8 @@ using static ILGPU.Stride1D;
 
 namespace Kernel.Domain.Gpu;
 
-public abstract class GpuRenderable<TGpuRen, TSettings> : IGpuRenderable<TGpuRen, TSettings>, IDisposable, IRenderable
-    where TGpuRen : class, IGpuRenderable<TGpuRen, TSettings>
+public abstract class GpuRenderable<TGpuRen, TSettings> : Combinable<TGpuRen>, IDisposable
+    where TGpuRen : GpuRenderable<TGpuRen, TSettings>
     where TSettings : struct
 {
     protected GpuRenderable(Size imageSize, Action<Index1D, TSettings, ArrayView1D<int, Dense>> kernel)
@@ -25,19 +25,19 @@ public abstract class GpuRenderable<TGpuRen, TSettings> : IGpuRenderable<TGpuRen
 
     public TSettings Settings { get; set; }
 
-    public MemoryBuffer1D<int, Dense>? GetBuffer() => buffer;
+    protected override MemoryBuffer1D<int, Dense> GetBuffer() => buffer;
 
-    public DirectBitmap GetBitmap()
+    public override DirectBitmap GetBitmap()
     {
         if (buffer is null) Apply();
         return new DirectBitmap(buffer.GetAsArray1D(), ImageSize.Width, ImageSize.Height);
     }
 
-    public TGpuRen CopyToBitmap(DirectBitmap bitmap)
+    public override DirectBitmap Update(DirectBitmap bitmap)
     {
         if (bitmap.ImageSize != ImageSize) throw new ArgumentException($"{bitmap.ImageSize} not equal {ImageSize}");
         buffer.CopyToCPU(bitmap.Data);
-        return (this as TGpuRen)!;
+        return bitmap;
     }
 
     public TGpuRen Apply()
@@ -50,28 +50,6 @@ public abstract class GpuRenderable<TGpuRen, TSettings> : IGpuRenderable<TGpuRen
     public TGpuRen Config(TSettings settings)
     {
         Settings = settings;
-        return (this as TGpuRen)!;
-    }
-
-    public TGpuRen Add<TGpuRenOther, TSettingsOther>(GpuRenderable<TGpuRenOther, TSettingsOther> other)
-        where TSettingsOther : struct where TGpuRenOther : class, IGpuRenderable<TGpuRenOther, TSettingsOther>
-    {
-        if (buffer is null) Apply();
-        if (other.buffer is null) other.Apply();
-
-        GpuOperations.AddKernel(buffer!.IntExtent, buffer.View, other.buffer!.View);
-
-        return (this as TGpuRen)!;
-    }
-
-    public TGpuRen Multiply<TGpuRenOther, TSettingsOther>(GpuRenderable<TGpuRenOther, TSettingsOther> other)
-        where TSettingsOther : struct where TGpuRenOther : class, IGpuRenderable<TGpuRenOther, TSettingsOther>
-    {
-        if (buffer is null) Apply();
-        if (other.buffer is null) other.Apply();
-
-        GpuOperations.MulKernel(buffer!.IntExtent, buffer.View, other.buffer!.View);
-
         return (this as TGpuRen)!;
     }
 
