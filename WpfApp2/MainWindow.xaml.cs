@@ -25,7 +25,7 @@ namespace WpfApp2
         private static bool isStarted;
         private static bool videoInitialized;
         private CancellationTokenSource cts = new();
-        private const string TempFiles = @"C:\Users\Garipov\RiderProjects\ProjectNice\WpfApp2\bin\Debug\net6.0-windows\temp_img";
+        private const string TempFiles = @"C:\tempi";
 
 
         public MainWindow()
@@ -52,7 +52,7 @@ namespace WpfApp2
         {
             var generator = new VideoGenerator(new WavAudioMonoProvider(16000), 600, 400, audioPath, TempFiles);
             var i = 0;
-            foreach (var _ in generator.FunnyAnd())
+            foreach (var _ in generator.Planets())
             {
                 videoInitialized = true;
                 var temp = i;
