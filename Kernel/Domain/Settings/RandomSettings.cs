@@ -5,11 +5,14 @@ namespace Kernel.Domain.Settings;
 public readonly struct RandomSettings
 {
     public readonly RNGView<XorShift128Plus> RngView;
-   
-    public RandomSettings()
+    public readonly int Max;
+    public readonly int Min;
+
+    public RandomSettings(int min = int.MinValue, int max = int.MaxValue, Random? r = null)
     {
-        var r = new Random();
+        r ??= new Random();
         RngView = RNG.Create<XorShift128Plus>(Gpu.GpuSingleton.Gpu, r).GetView(Gpu.GpuSingleton.Gpu.WarpSize);
+        Min = min;
+        Max = max;
     }
-    
 }

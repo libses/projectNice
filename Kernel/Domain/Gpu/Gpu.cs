@@ -11,7 +11,7 @@ public static class GpuSingleton
     {
         var context = Context.Create()
             .EnableAlgorithms()
-            .Math(MathMode.Fast)
+            .Math(MathMode.Default)
             .AllAccelerators();
 #if RELEASE
         Gpu = context.ToContext().GetPreferredDevice(false).CreateAccelerator(context.ToContext());

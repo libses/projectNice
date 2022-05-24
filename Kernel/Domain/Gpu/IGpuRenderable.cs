@@ -13,9 +13,9 @@ public interface IGpuRenderable<TGpuRen, TSettings>
     TSettings Settings { get; set; }
     MemoryBuffer1D<int, Stride1D.Dense>? GetBuffer();
     TGpuRen CopyToBitmap(DirectBitmap bitmap);
-    DirectBitmap ToBitmap();
+    DirectBitmap GetBitmap();
 
     TGpuRen Apply();
 
-    TGpuRen WithSettings(TSettings settings);
+    TGpuRen Config(TSettings settings);
 }

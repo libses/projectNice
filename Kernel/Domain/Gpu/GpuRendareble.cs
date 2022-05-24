@@ -1,12 +1,13 @@
 ﻿using System.Drawing;
 using ILGPU;
 using ILGPU.Runtime;
+using Kernel.Domain.Interfaces;
 using Kernel.Domain.Utils;
 using static ILGPU.Stride1D;
 
 namespace Kernel.Domain.Gpu;
 
-public abstract class GpuRenderable<TGpuRen, TSettings> : IGpuRenderable<TGpuRen, TSettings>, IDisposable
+public abstract class GpuRenderable<TGpuRen, TSettings> : IGpuRenderable<TGpuRen, TSettings>, IDisposable, IRenderable
     where TGpuRen : class, IGpuRenderable<TGpuRen, TSettings>
     where TSettings : struct
 {
@@ -26,7 +27,7 @@ public abstract class GpuRenderable<TGpuRen, TSettings> : IGpuRenderable<TGpuRen
 
     public MemoryBuffer1D<int, Dense>? GetBuffer() => buffer;
 
-    public DirectBitmap ToBitmap()
+    public DirectBitmap GetBitmap()
     {
         if (buffer is null) Apply();
         return new DirectBitmap(buffer.GetAsArray1D(), ImageSize.Width, ImageSize.Height);
@@ -46,7 +47,7 @@ public abstract class GpuRenderable<TGpuRen, TSettings> : IGpuRenderable<TGpuRen
         return (this as TGpuRen)!;
     }
 
-    public TGpuRen WithSettings(TSettings settings)
+    public TGpuRen Config(TSettings settings)
     {
         Settings = settings;
         return (this as TGpuRen)!;
@@ -62,7 +63,7 @@ public abstract class GpuRenderable<TGpuRen, TSettings> : IGpuRenderable<TGpuRen
 
         return (this as TGpuRen)!;
     }
-    
+
     public TGpuRen Multiply<TGpuRenOther, TSettingsOther>(GpuRenderable<TGpuRenOther, TSettingsOther> other)
         where TSettingsOther : struct where TGpuRenOther : class, IGpuRenderable<TGpuRenOther, TSettingsOther>
     {
