@@ -2,9 +2,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Kernel.Services;
 using Microsoft.Win32;
 
 namespace WpfApp2
@@ -21,8 +21,11 @@ namespace WpfApp2
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Image imgViewer;
-        private MediaPlayer mediaPlayer = new();
+        private readonly MediaPlayer mediaPlayer = new();
+        private static bool isStarted;
+        private static bool videoInitialized;
+        private CancellationTokenSource cts = new();
+        private const string TempFiles = @"C:\Users\Garipov\RiderProjects\ProjectNice\WpfApp2\bin\Debug\net6.0-windows\temp_img";
 
 
         public MainWindow()
@@ -30,11 +33,13 @@ namespace WpfApp2
             InitializeComponent();
             PlayBtn.Click += (_, _) =>
             {
-                if (videoInitialized)
+                while (!videoInitialized)
                 {
-                    isStarted = true;
-                    mediaPlayer.Play();
+                    Thread.Yield();
                 }
+
+                isStarted = true;
+                mediaPlayer.Play();
             };
             PauseBtn.Click += (_, _) =>
             {
@@ -43,18 +48,17 @@ namespace WpfApp2
             };
         }
 
-        private static bool isStarted;
-        private static bool videoInitialized;
-
-        void StartImageUpdater(string path)
+        private void StartImageUpdater(string audioPath, CancellationToken ct)
         {
-            var generator = new VideoGenerator(path, 1280, 720);
+            var generator = new VideoGenerator(new WavAudioMonoProvider(16000), 600, 400, audioPath, TempFiles);
             var i = 0;
-            foreach (var _ in generator.Planets(30))
+            foreach (var _ in generator.FunnyAnd())
             {
                 videoInitialized = true;
                 var temp = i;
                 i++;
+                if (ct.IsCancellationRequested)
+                    break;
                 while (!isStarted)
                 {
                 }
@@ -62,21 +66,27 @@ namespace WpfApp2
                 Dispatcher.Invoke(() =>
                 {
                     var img = new BitmapImage(new Uri(
-                        $@"C:\Users\Garipov\RiderProjects\ProjectNice\WpfApp2\bin\Debug\net6.0-windows\temp_img\{temp}.bmp"));
+                        $@"{TempFiles}\{temp}.bmp"));
                     return ImageViewer1.Source = img;
                 });
-                Thread.Sleep(6);
+               // Thread.Sleep(6);
             }
         }
 
+
         private void btnOpenFile_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Audio files (*.mp3;*.wav;*.aac)|*.mp3;*.wav;*.aac";
+            var openFileDialog = new OpenFileDialog
+            {
+                Filter = "Audio files (*.mp3;*.wav;*.aac)|*.mp3;*.wav;*.aac"
+            };
+            cts.Cancel();
+            cts = new CancellationTokenSource();
             if (openFileDialog.ShowDialog() == true)
             {
                 mediaPlayer.Open(new Uri(openFileDialog.FileName));
-                Task.Run(() => StartImageUpdater(openFileDialog.FileName));
+                isStarted = false;
+                Task.Run(() => StartImageUpdater(openFileDialog.FileName, cts.Token));
             }
         }
     }

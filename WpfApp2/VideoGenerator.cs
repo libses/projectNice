@@ -1,76 +1,78 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using Kernel.Domain;
+using System.IO;
 using Kernel.Domain.Settings;
-using NAudio.Wave;
-using Spectrogram;
+using Kernel.Domain;
+using Kernel.Domain.Utils;
+using Kernel.Services;
+using Kernel.Services.Interfaces;
 
 namespace WpfApp2;
 
 public class VideoGenerator
 {
-    private string filePath;
+    private readonly string audioPath;
+    private readonly IWavAudioProvider audioProvider;
     private readonly int width;
     private readonly int height;
 
-    private static readonly string tempFilesPath =
-        $@"C:\Users\Garipov\RiderProjects\ProjectNice\WpfApp2\bin\Debug\net6.0-windows\temp_img";
+    private string TempFilesPath;
 
-    public VideoGenerator(string path, int width, int height)
+    public VideoGenerator(IWavAudioProvider audioProvider, int width, int height, string audioPath,
+        string tempFilesPath)
     {
-        filePath = path;
+        TempFilesPath = tempFilesPath;
+        if (!Directory.Exists(TempFilesPath))
+            Directory.CreateDirectory(TempFilesPath);
+
+        this.audioProvider = audioProvider;
         this.width = width;
         this.height = height;
+        this.audioPath = audioPath;
     }
 
-    public (double[] audio, int sampleRate) ReadWavMono(double multiplier = 16_000)
-    {
-        using var afr = new AudioFileReader(filePath);
-        int sampleRate = afr.WaveFormat.SampleRate;
-        int bytesPerSample = afr.WaveFormat.BitsPerSample / 8;
-        int sampleCount = (int)(afr.Length / bytesPerSample);
-        int channelCount = afr.WaveFormat.Channels;
-        var audio = new List<double>(sampleCount);
-        var buffer = new float[sampleRate * channelCount];
-        int samplesRead = 0;
-        while ((samplesRead = afr.Read(buffer, 0, buffer.Length)) > 0)
-            audio.AddRange(buffer.Take(samplesRead).Select(x => x * multiplier));
-        return (audio.ToArray(), sampleRate);
-    }
 
-    public List<double[]> GenerateMusicVideoFull()
+    public IEnumerable<int> Planets()
     {
-        (double[] audio, int sampleRate) = ReadWavMono();
-        var sg = new SpectrogramGenerator(sampleRate, fftSize: 4096, stepSize: 2000, maxFreq: 3000);
-        sg.Add(audio);
-        var fft = sg.GetFFTs();
-        return fft;
-    }
-    
-
-
-    public IEnumerable<int> Planets(int speed)
-    {
-      //  var fft = GenerateMusicVideoFull();
-        var f = new Planets(width, height).Config(new PlanetsSettings(20, 10, 100, Brushes.Chartreuse));
-        f.speed = 10;
-        for (int i = 0; i < 10000000; i++)
+        var f = new Planets(width, height)
+            .Config(new PlanetsSettings(20, 10, 100, Brushes.Chartreuse, new Random()));
+        for (var i = 0; i < 10000000; i++)
         {
             var bmp = f.GetBitmap().Bitmap;
-            bmp.Save($@"{tempFilesPath}\{i}.bmp");
+            bmp.Save($@"{TempFilesPath}\{i}.bmp");
             bmp.Dispose();
             yield return 1;
         }
     }
+
     public IEnumerable<int> Funny()
     {
-        var fft = GenerateMusicVideoFull();
+        var fft = new FFTGenerator(audioProvider).GetFFT(audioPath);
         var f = new Funny(width, height).Config(new FunnySettings(fft));
         for (int i = 0; i < fft.Count; i++)
         {
             var bmp = f.GetBitmap().Bitmap;
-            bmp.Save($@"{tempFilesPath}\{i}.bmp");
+            bmp.Save($@"{TempFilesPath}\{i}.bmp");
+            bmp.Dispose();
+            yield return 1;
+        }
+    }
+
+    public IEnumerable<int> FunnyAnd()
+    {
+        var fft = new FFTGenerator(audioProvider).GetFFT(audioPath);
+        var added =
+            ImageBase.Create()
+                .Config(new ImageSettings(width, height))
+                .Add<Funny>(f => f.Config(new FunnySettings(fft)))
+                .Add<ThreeD>(f => f.Config(new ThreeDSettings(fft)))
+                .Add<Mandelbrot>(f => f.Config(new MandelbrotSettings(2d, 0, 0, width, height)))
+                .Add<Constant>(c => c.Config(new ConstantSettings(Color.Brown)));
+        for (int i = 0; i < fft.Count; i++)
+        {
+            var bmp = added.GetBitmap();
+            bmp.Bitmap.Save($@"{TempFilesPath}\{i}.bmp");
             bmp.Dispose();
             yield return 1;
         }
