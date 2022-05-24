@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Threading.Tasks;
 using Kernel.Domain.Settings;
 using Kernel.Domain;
 using Kernel.Domain.Utils;
@@ -16,6 +17,8 @@ public class VideoGenerator
     private readonly IWavAudioProvider audioProvider;
     private readonly int width;
     private readonly int height;
+    private List<double[]> fft;
+    public int FftCount => fft.Count;
 
     private string TempFilesPath;
 
@@ -25,11 +28,18 @@ public class VideoGenerator
         TempFilesPath = tempFilesPath;
         if (!Directory.Exists(TempFilesPath))
             Directory.CreateDirectory(TempFilesPath);
+        var di = new DirectoryInfo(TempFilesPath);
+        foreach (var file in di.GetFiles())
+        {
+            file.Delete();
+        }
+        
 
         this.audioProvider = audioProvider;
         this.width = width;
         this.height = height;
         this.audioPath = audioPath;
+        fft = new FFTGenerator(audioProvider).GetFFT(audioPath);
     }
 
 
@@ -46,35 +56,55 @@ public class VideoGenerator
         }
     }
 
-    public IEnumerable<int> Funny()
+    public async void Funny()
     {
-        var fft = new FFTGenerator(audioProvider).GetFFT(audioPath);
         var f = new Funny(width, height).Config(new FunnySettings(fft));
-        for (int i = 0; i < fft.Count; i++)
+        await Task.Run(() =>
         {
-            var bmp = f.GetBitmap().Bitmap;
-            bmp.Save($@"{TempFilesPath}\{i}.bmp");
-            bmp.Dispose();
-            yield return 1;
-        }
+            for (int i = 0; i < fft.Count; i++)
+            {
+                var bmp = f.GetBitmap().Bitmap;
+                bmp.Save($@"{TempFilesPath}\{i}.bmp");
+                bmp.Dispose();
+            }
+        });
     }
 
-    public IEnumerable<int> FunnyAnd()
+    public async void FunnyAnd()
     {
-        var fft = new FFTGenerator(audioProvider).GetFFT(audioPath);
         var added =
             ImageBase.Create()
                 .Config(new ImageSettings(width, height))
-                .Add<Funny>(f => f.Config(new FunnySettings(fft)))
-                .Add<ThreeD>(f => f.Config(new ThreeDSettings(fft)))
-                .Add<Mandelbrot>(f => f.Config(new MandelbrotSettings(2d, 0, 0, width, height)))
-                .Add<Constant>(c => c.Config(new ConstantSettings(Color.Brown)));
-        for (int i = 0; i < fft.Count; i++)
+                .Add<Planets>(p => p.Config(new PlanetsSettings(20, 10, 100, Brushes.Chartreuse, new Random())))
+                .Add<Funny>(p => p.Config(new FunnySettings(fft)));
+        await Task.Run(() =>
         {
-            var bmp = added.GetBitmap();
-            bmp.Bitmap.Save($@"{TempFilesPath}\{i}.bmp");
-            bmp.Dispose();
-            yield return 1;
-        }
+            for (var i = 0; i < fft.Count; i++)
+            {
+                var bmp = added.GetBitmap();
+                bmp.Bitmap.Save($@"{TempFilesPath}\{i}.bmp");
+                bmp.Dispose();
+            }
+        });
+    }
+    
+    public async void Mandelbrot()
+    {
+        var added =
+            ImageBase.Create()
+                .Config(new ImageSettings(width, height))
+                // .Add<Planets>(p => p.Config(new PlanetsSettings(20, 10, 100, Brushes.Chartreuse, new Random())))
+                .Add<Funny>(p => p.Config(new FunnySettings(fft)))
+                .Add<Mandelbrot>(m => m.Config(new MandelbrotSettings(1, 0, 0, width, height)))
+            ;
+        await Task.Run(() =>
+        {
+            for (var i = 0; i < fft.Count; i++)
+            {
+                var bmp = added.GetBitmap();
+                bmp.Bitmap.Save($@"{TempFilesPath}\{i}.bmp");
+                bmp.Dispose();
+            }
+        });
     }
 }
