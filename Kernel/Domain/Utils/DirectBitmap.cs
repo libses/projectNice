@@ -1,16 +1,34 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using ILGPU;
+using ILGPU.Runtime;
 
 #pragma warning disable CS8618
 
 namespace Kernel.Domain.Utils;
 
-public class DirectBitmap : IDisposable
+public class DirectBitmap : Combinable<DirectBitmap>, IDisposable
 {
-    public Bitmap Bitmap { get; private set; }
+    private Bitmap bitmap;
+
+    public Bitmap Bitmap
+    {
+        get
+        {
+            if (buffer is not null && !buffer.IsDisposed)
+            {
+                buffer.CopyToCPU(Data);
+                buffer.Dispose();
+            }
+
+            return bitmap;
+        }
+        private set => bitmap = value;
+    }
 
     private Int32[] data;
+    private MemoryBuffer1D<int, Stride1D.Dense>? buffer;
 
     public Int32[] Data
     {
@@ -59,7 +77,7 @@ public class DirectBitmap : IDisposable
         int col = Data[index];
         Color result = Color.FromArgb(col);
 
-        return result;
+        return Bitmap.GetPixel(x, y);
     }
 
     public void Dispose()
@@ -68,5 +86,25 @@ public class DirectBitmap : IDisposable
         Disposed = true;
         Bitmap.Dispose();
         BitsHandle.Free();
+    }
+
+    protected override MemoryBuffer1D<int, Stride1D.Dense> GetBuffer()
+    {
+        if (buffer is null || buffer.IsDisposed)
+        {
+            buffer = Gpu.GpuSingleton.Gpu.Allocate1D(Data);
+        }
+
+        return buffer;
+    }
+
+    public override DirectBitmap GetBitmap()
+    {
+        return this;
+    }
+
+    public override DirectBitmap Update(DirectBitmap bitmap)
+    {
+        return this;
     }
 }

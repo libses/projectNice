@@ -25,7 +25,15 @@ public abstract class GpuRenderable<TGpuRen, TSettings> : Combinable<TGpuRen>, I
 
     public TSettings Settings { get; set; }
 
-    protected override MemoryBuffer1D<int, Dense> GetBuffer() => buffer;
+    protected override MemoryBuffer1D<int, Dense> GetBuffer()
+    {
+        if (buffer is null)
+        {
+            Apply();
+        }
+
+        return buffer!;
+    }
 
     public override DirectBitmap GetBitmap()
     {

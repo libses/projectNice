@@ -105,7 +105,7 @@ namespace KernelTests
             var s = new Constant(100, 100).Config(new ConstantSettings(Color.FromArgb(1, 1, 1)));
             var bmp = f.GetBitmap();
             bmp.Multiply(s.GetBitmap());
-            bmp.GetPixel(0, 1).Should().Be(Color.FromArgb(1, 1, 1));
+            bmp.GetPixel(0, 1).Should().Be(Color.FromArgb(255, 255, 255));
         }
     }
 

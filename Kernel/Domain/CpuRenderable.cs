@@ -1,4 +1,5 @@
-﻿using ILGPU;
+﻿using System.Diagnostics;
+using ILGPU;
 using ILGPU.Runtime;
 using Kernel.Domain.Utils;
 
@@ -11,15 +12,22 @@ namespace Kernel.Domain
 
         protected readonly int Height;
 
+        protected MemoryBuffer1D<int, Stride1D.Dense>? buffer;
+
         private readonly TContext? context;
+
 
         public TSettings Settings { get; set; }
 
 
         protected override MemoryBuffer1D<int, Stride1D.Dense> GetBuffer()
         {
-            var data = GetBitmap().Data;
-        return Gpu.GpuSingleton.Gpu.Allocate1D(data);
+            if (buffer is null || buffer.IsDisposed)
+            {
+                buffer = Gpu.GpuSingleton.Gpu.Allocate1D(GetBitmap().Data);
+            }
+
+            return buffer;
         }
 
         protected CpuRenderable(int width, int height)
@@ -35,8 +43,31 @@ namespace Kernel.Domain
             return context;
         }
 
-        public abstract override DirectBitmap GetBitmap();
+        public override DirectBitmap GetBitmap()
+        {
+            if (buffer is not null && !buffer.IsDisposed)
+            {
+                var data = buffer.GetAsArray1D();
+                buffer.Dispose();
+                return new DirectBitmap(data, Width, Height);
+            }
 
-        public abstract override DirectBitmap Update(DirectBitmap bitmap);
+            return Process(new DirectBitmap(Width, Height));
+        }
+
+        public override DirectBitmap Update(DirectBitmap bitmap)
+        {
+            if (buffer is not null && !buffer.IsDisposed)
+            {
+                var data = buffer.GetAsArray1D();
+                buffer.Dispose();
+                bitmap.Data = data;
+                return bitmap;
+            }
+
+            return Process(bitmap);
+        }
+
+        protected abstract DirectBitmap Process(DirectBitmap bitmap);
     }
 }
