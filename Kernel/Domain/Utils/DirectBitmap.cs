@@ -27,6 +27,8 @@ public class DirectBitmap : IDisposable
     public int Height { get; private set; }
     public int Width { get; private set; }
 
+    public Size ImageSize => new(Width, Height);
+
     protected GCHandle BitsHandle { get; private set; }
 
     public DirectBitmap(int width, int height)

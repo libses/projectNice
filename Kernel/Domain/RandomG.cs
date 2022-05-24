@@ -1,30 +1,20 @@
 ﻿using System.Drawing;
+using ILGPU;
+using ILGPU.Runtime;
+using Kernel.Domain.Gpu;
 using Kernel.Domain.Settings;
 using Kernel.Domain.Utils;
 
 namespace Kernel.Domain;
 
-public class RandomG : Renderable<RandomG, RandomSettings>
+public class RandomG : GpuRenderable<RandomG, RandomSettings>
 {
-    public override DirectBitmap GetBitmap()
+    public RandomG(int width, int height) : base(new Size(width, height), ComputeFromGpu)
     {
-        var bmp = new DirectBitmap(Width, Height);
-        var r = Settings.Random;
-        for (var x = 0; x < Width; x++)
-        {
-            for (var y = 0; y < Height; y++)
-            {
-                var R = r.Next(Settings.Start, Settings.End);
-                var G = r.Next(Settings.Start, Settings.End);
-                var B = r.Next(Settings.Start, Settings.End);
-                bmp.SetPixel(x, y, Color.FromArgb(R, G, B));
-            }
-        }  
-
-        return bmp;
     }
 
-    public RandomG(int width, int height) : base(width, height)
+    private static void ComputeFromGpu(Index1D index, RandomSettings settings, ArrayView1D<int, Stride1D.Dense> data)
     {
+        data[index] = settings.RngView.Next();
     }
 }

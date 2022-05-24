@@ -1,31 +1,33 @@
 ﻿using System.Drawing;
 using System.Numerics;
-using Kernel.Domain.Settings;
-using Kernel.Domain.Utils;
+using ILGPU;
+using ILGPU.Runtime;
+using Kernel.Domain.Gpu;
 
 namespace Kernel.Domain
 {
-    public class Gradient : Renderable<Gradient, GradientSettings>
+    public class Gradient : GpuRenderable<Gradient, Size>
     {
-        public override DirectBitmap GetBitmap()
+        private static void ComputeFromGpu(Index1D index,
+            Size size,
+            ArrayView1D<Int32, Stride1D.Dense> buffer)
         {
-            var bmp = new DirectBitmap(Width, Height);
-            for (var x = 0; x < Width; x++)
-            for (var y = 0; y < Height; y++)
-            {
-                var dx = x / 256d;
-                var dy = y / 256d;
-                var complex = new Complex(dx, dy);
-                var t = (2 * complex.Phase / Math.PI).ToInt();
+            var x = index.X % size.Width;
+            var y = index.X / size.Width;
 
-                bmp.SetPixel(x, y, Color.FromArgb(t, t, t));
-            }
+            var dx = x / 256d;
+            var dy = y / 256d;
 
-            return bmp;
+            var complex = new Complex(dx, dy);
+
+            var res = 2 * complex.Phase / MathF.PI;
+
+            buffer[index] = GpuOperations.Crop((int) res * 255);
         }
 
-        public Gradient(int width, int height) : base(width, height)
+        public Gradient(int width, int height) : base(new Size(width, height), ComputeFromGpu)
         {
+            Settings = ImageSize;
         }
     }
 }
