@@ -30,7 +30,7 @@ namespace WpfApp2
         private CancellationTokenSource cts = new();
 
         private const string TempFiles =
-            @"C:\Users\Garipov\RiderProjects\ProjectNice\WpfApp2\bin\Debug\net6.0-windows\temp_img";
+            @".\temp_img";
 
 
         public MainWindow()

@@ -57,7 +57,7 @@ public class ImageBase : Configurer<ImageSettings>
                 var obj = type
                     .GetConstructor(new[] { typeof(int), typeof(int) })?.Invoke(new[]
                     {
-                    Settings.Width, (object) Settings.Height
+                        Settings.Width, (object)Settings.Height
                     });
                 var renderable = getter.DynamicInvoke(obj) as IRenderable;
                 renderables.Add(renderable);

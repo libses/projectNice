@@ -19,7 +19,7 @@ public class KernelBuilder
     public static KernelBuilder Create()
     {
         var builder = new KernelBuilder();
-        builder.Kernel.Bind<ImageBase>().ToSelf().InSingletonScope();
+       // builder.Kernel.Bind<ImageBase>().ToSelf().InSingletonScope();
         
 
         return builder;

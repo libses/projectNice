@@ -8,6 +8,8 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using Kernel.Domain.Interfaces;
+using Ninject;
 
 namespace VideoGenerator
 {
@@ -40,7 +42,8 @@ namespace VideoGenerator
             Console.WriteLine("Например \nf\n+\nc 210 200 100");
             Console.WriteLine("и e чтобы закончить ввод");
             Console.WriteLine();
-            Console.WriteLine("параметры: \nf пусто, \nt пусто, \nm пусто, \np количествоПланет минРазмер максРазмер \nc R G B");
+            Console.WriteLine(
+                "параметры: \nf пусто, \nt пусто, \nm пусто, \np количествоПланет минРазмер максРазмер \nc R G B");
             var fftR = new FFTGenerator(new WavAudioMonoProvider(16000));
             var fft = fftR.GetFFT(wavname);
             var read = Console.ReadLine();
@@ -50,6 +53,15 @@ namespace VideoGenerator
             var zoom = 1d;
             var mandel = new Mandelbrot(x, y).Config(new MandelbrotSettings(zoom, -0.74529, 0.113075, x, y));
             bool isMandelHere = false;
+            var kernel = KernelBuilder
+                .Create()
+                .ConfigureFFTGenerator(16000)
+                .ConfigureVideoCreator(x, y, 44, "C:\\ff\\bin")
+                .ConfigureBitmapProvider("temp", "jpg", count)
+                .Kernel;
+            kernel.Bind<ImageBase>().ToMethod(_ => ImageBase.Create().Config(new ImageSettings(x, y)));
+            kernel.Bind<Builder>().ToSelf();
+
             while (read != "e")
             {
                 var split = read.Split();
@@ -57,66 +69,80 @@ namespace VideoGenerator
                 switch (operation)
                 {
                     case "f":
-                        {
-                            if (sign == Sign.Add)
-                                ib = ib.Add<Funny>(z => new Funny(x, y).Config(new FunnySettings(fft)));
-                            else if (sign == Sign.Multiply)
-                                ib = ib.Multiply<Funny>(z => new Funny(x, y).Config(new FunnySettings(fft)));
-                            break;
-                        }
+                    {
+                        if (sign == Sign.Add)
+                            kernel.Bind<IRenderable>().ToMethod(_ => new Funny(x, y).Config(new FunnySettings(fft)));
+                        // ib = ib.Add<Funny>(z => new Funny(x, y).Config(new FunnySettings(fft)));
+                        else if (sign == Sign.Multiply)
+                            ib = ib.Multiply<Funny>(z => new Funny(x, y).Config(new FunnySettings(fft)));
+                        break;
+                    }
                     case "c":
-                        {
-                            var rgb = split.Skip(1).Select(x => int.Parse(x)).ToArray();
-                            if (sign == Sign.Add)
-                                ib = ib.Add<Constant>(z => new Constant(x, y).Config(new ConstantSettings(Color.FromArgb(rgb[0], rgb[1], rgb[2]))));
-                            else if (sign == Sign.Multiply)
-                                ib = ib.Multiply<Constant>(z => new Constant(x, y).Config(new ConstantSettings(Color.FromArgb(rgb[0], rgb[1], rgb[2]))));
-                            break;
-                        }
+                    {
+                        var rgb = split.Skip(1).Select(x => int.Parse(x)).ToArray();
+                        if (sign == Sign.Add)
+                            kernel.Bind<IRenderable>().ToMethod(_ =>
+                                new Constant(x, y).Config(
+                                    new ConstantSettings(Color.FromArgb(rgb[0], rgb[1], rgb[2]))));
+
+                        // ib = ib.Add<Constant>(z =>
+                        //     new Constant(x, y).Config(new ConstantSettings(Color.FromArgb(rgb[0], rgb[1], rgb[2]))));
+                        else if (sign == Sign.Multiply)
+                            ib = ib.Multiply<Constant>(z =>
+                                new Constant(x, y).Config(
+                                    new ConstantSettings(Color.FromArgb(rgb[0], rgb[1], rgb[2]))));
+                        break;
+                    }
                     case "t":
-                        {
-                            if (sign == Sign.Add)
-                                ib = ib.Add<ThreeD>(z => new ThreeD(x, y).Config(new ThreeDSettings(fft)));
-                            else if (sign == Sign.Multiply)
-                                ib = ib.Multiply<ThreeD>(z => new ThreeD(x, y).Config(new ThreeDSettings(fft)));
-                            break;
-                        }
+                    {
+                        if (sign == Sign.Add)
+                            kernel.Bind<IRenderable>().ToMethod(_ => new ThreeD(x, y).Config(new ThreeDSettings(fft)));
+                        // ib = ib.Add<ThreeD>(z => new ThreeD(x, y).Config(new ThreeDSettings(fft)));
+                        else if (sign == Sign.Multiply)
+                            ib = ib.Multiply<ThreeD>(z => new ThreeD(x, y).Config(new ThreeDSettings(fft)));
+                        break;
+                    }
                     case "m":
-                        {
-                            isMandelHere = true;
-                            if (sign == Sign.Add)
-                                ib = ib.Add<Mandelbrot>(x => mandel);
-                            else if (sign == Sign.Multiply)
-                                ib = ib.Multiply<Mandelbrot>(x => mandel);
-                            break;
-                        }
+                    {
+                        isMandelHere = true;
+                        if (sign == Sign.Add)
+                            kernel.Bind<IRenderable>().ToMethod(_ => mandel);
+                        //     ib = ib.Add<Mandelbrot>(x => mandel);
+                        else if (sign == Sign.Multiply)
+                            ib = ib.Multiply<Mandelbrot>(x => mandel);
+                        break;
+                    }
                     case "p":
-                        {
-                            var planetsConf = split.Skip(1).Select(x => int.Parse(x)).ToArray();
-                            if (sign == Sign.Add)
-                                ib = ib.Add<Planets>(z => new Planets(x, y).Config(new PlanetsSettings(planetsConf[0], planetsConf[1], planetsConf[2], new Random())));
-                            else if (sign == Sign.Multiply)
-                                ib = ib.Multiply<Planets>(z => new Planets(x, y).Config(new PlanetsSettings(planetsConf[0], planetsConf[1], planetsConf[2], new Random())));
-                            break;
-                        }
+                    {
+                        var planetsConf = split.Skip(1).Select(x => int.Parse(x)).ToArray();
+                        if (sign == Sign.Add)
+                            kernel.Bind<IRenderable>().ToMethod(_ => new Planets(x, y).Config(new PlanetsSettings(
+                                planetsConf[0], planetsConf[1],
+                                planetsConf[2], new Random())));
+                        // ib = ib.Add<Planets>(z =>
+                        //     new Planets(x, y).Config(new PlanetsSettings(planetsConf[0], planetsConf[1],
+                        //         planetsConf[2], new Random())));
+                        else if (sign == Sign.Multiply)
+                            ib = ib.Multiply<Planets>(z =>
+                                new Planets(x, y).Config(new PlanetsSettings(planetsConf[0], planetsConf[1],
+                                    planetsConf[2], new Random())));
+                        break;
+                    }
                     case "+":
-                        {
-                            sign = Sign.Add;
-                            break;
-                        }
+                    {
+                        sign = Sign.Add;
+                        break;
+                    }
                     case "*":
-                        {
-                            sign = Sign.Multiply;
-                            break;
-                        }
+                    {
+                        sign = Sign.Multiply;
+                        break;
+                    }
                 }
 
                 read = Console.ReadLine();
             }
-            var kernel = KernelBuilder.Create();
-            kernel.ConfigureFFTGenerator(16000);
-            kernel.ConfigureVideoCreator(x, y, 44, "C:\\ff\\bin");
-            kernel.ConfigureBitmapProvider("temp", "jpg", count);
+
             if (!Directory.Exists("temp"))
             {
                 Directory.CreateDirectory("temp");
@@ -131,7 +157,8 @@ namespace VideoGenerator
                     mandel.Apply();
                 }
 
-                ib.GetBitmap().Bitmap.SaveJPG100("temp/" + i + ".jpg");
+                kernel.Get<Builder>().Build().GetBitmap().Bitmap.SaveJPG100("temp/" + i + ".jpg");
+                //     ib.GetBitmap().Bitmap.SaveJPG100("temp/" + i + ".jpg");
             }
 
             var vc = new VideoCreator(new VideoEncoderSettings(x, y, 44, VideoCodec.H265));

@@ -64,4 +64,5 @@ public class ImageBaseTests
         bitmap.Size.Should().Be(new Size(1, 1));
         bitmap.GetPixel(0, 0).Should().Be(Color.Brown.Multiply(Color.Aqua).Add(Color.Orange));
     }
+    
 }

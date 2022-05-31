@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Threading.Tasks;
 using Kernel.Domain.Settings;
 using Kernel.Domain;
-using Kernel.Domain.Utils;
 using Kernel.Services;
 using Kernel.Services.Interfaces;
 
@@ -75,7 +73,7 @@ public class VideoGenerator
         var added =
             ImageBase.Create()
                 .Config(new ImageSettings(width, height))
-                .Add<Planets>(p => p.Config(new PlanetsSettings(20, 10, 100, Brushes.Chartreuse, new Random())))
+                .Add<Planets>(p => p.Config(new PlanetsSettings(20, 10, 100, new Random())))
                 .Add<Funny>(p => p.Config(new FunnySettings(fft)));
         await Task.Run(() =>
         {
