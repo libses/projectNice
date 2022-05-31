@@ -25,7 +25,6 @@ namespace Kernel.Domain
         public readonly double B;
     }
 
-    [SuppressMessage("ReSharper", "PossibleLossOfFraction")]
     public class Mandelbrot : GpuRenderable<Mandelbrot, MandelbrotSettings>
     {
         public Mandelbrot(int width, int height) : base(new Size(width, height), ComputeFromGpu)
@@ -37,20 +36,14 @@ namespace Kernel.Domain
             ArrayView1D<Int32, Stride1D.Dense> buffer)
         {
             var z = Complex.Zero;
-            var xxW = index.X % settings.Width / (double) settings.Width;
-            var yyW = index.X / settings.Width / (double) settings.Height;
+            var xxW = index.X % settings.Width / (double)settings.Width;
+            var yyW = (double)index.X / settings.Width / settings.Height;
             var c = new Complex((xxW - 0.5) * settings.Scale + settings.A,
                 (yyW - 0.5) * settings.Scale + settings.B);
-            for (int i = 1; i < 256; i++)
+            for (var i = 1; i < 256; i++)
             {
-                if (i == 255)
-                {
-                    buffer[index] = 0;
-                }
-
                 z = z * z + c;
-                var modulo = z.Imaginary * z.Imaginary + z.Real * z.Real;
-                if (!(modulo >= 4)) continue;
+                if (i != 255 && z.Magnitude < 4) continue;
                 var r = 255 - i;
                 buffer[index] = r * 256 * 256 * 256 + r * 256 * 256 + r * 256 + r;
                 break;
