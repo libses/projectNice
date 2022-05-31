@@ -5,11 +5,11 @@ VisualStudioVersion = 17.0.32126.317
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kernel", "Kernel\Kernel.csproj", "{CA3F2D2A-29C3-4D5A-9049-6710B77AABED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp", "ConsoleApp\ConsoleApp.csproj", "{75E38D2C-A200-496A-9A4D-80DA13351B02}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VideoGenerator", "ConsoleApp\VideoGenerator.csproj", "{75E38D2C-A200-496A-9A4D-80DA13351B02}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp2", "WpfApp2\WpfApp2.csproj", "{2E2BC169-9A96-41E3-AC6E-EFD5C75E74C7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WpfApp2", "WpfApp2\WpfApp2.csproj", "{2E2BC169-9A96-41E3-AC6E-EFD5C75E74C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KernelTests", "KernelTests\KernelTests.csproj", "{84406EFE-6F22-4F17-ADCE-CC4BAB328C38}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KernelTests", "KernelTests\KernelTests.csproj", "{84406EFE-6F22-4F17-ADCE-CC4BAB328C38}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

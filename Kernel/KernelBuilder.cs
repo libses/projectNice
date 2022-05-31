@@ -3,6 +3,7 @@ using FFMediaToolkit.Encoding;
 using Kernel.Services;
 using Kernel.Services.Interfaces;
 using Ninject;
+using System.Drawing;
 
 namespace Kernel;
 
@@ -19,8 +20,15 @@ public class KernelBuilder
     {
         var builder = new KernelBuilder();
         builder.Kernel.Bind<ImageBase>().ToSelf().InSingletonScope();
+        
 
         return builder;
+    }
+
+    public KernelBuilder ConfigureBitmapProvider(string dirname, string format, int counter)
+    {
+        Kernel.Bind<IImageProvider<Bitmap>>().ToConstant(new BitmapProvider(dirname, format, counter));
+        return this;
     }
 
     public KernelBuilder ConfigureVideoCreator(int width, int height, int fps, string ffmpegPath)

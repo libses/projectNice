@@ -46,7 +46,7 @@ public class VideoGenerator
     public IEnumerable<int> Planets()
     {
         var f = new Planets(width, height)
-            .Config(new PlanetsSettings(20, 10, 100, Brushes.Chartreuse, new Random()));
+            .Config(new PlanetsSettings(20, 10, 100, new Random()));
         for (var i = 0; i < 10000000; i++)
         {
             var bmp = f.GetBitmap().Bitmap;

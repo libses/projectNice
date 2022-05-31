@@ -6,11 +6,13 @@ namespace Kernel.Services;
 
 public class ImageBase : Configurer<ImageSettings>
 {
-    private readonly List<(IRenderable, Action<DirectBitmap, DirectBitmap>)> items;
-    
+    private readonly List<(Type type, Action<DirectBitmap, DirectBitmap> action, Delegate getter)> items;
+    private bool isFirstTime = true;
+    private readonly List<IRenderable> renderables = new List<IRenderable>();
+
     private ImageBase()
     {
-        items = new List<(IRenderable, Action<DirectBitmap, DirectBitmap>)>();
+        items = new List<(Type, Action<DirectBitmap, DirectBitmap>, Delegate)>();
     }
 
     public static ConfigurationContext<ImageBase, ImageBase, ImageSettings> Create()
@@ -23,39 +25,55 @@ public class ImageBase : Configurer<ImageSettings>
     }
 
     public ImageBase Add<TRenderable>(Func<TRenderable, TRenderable> renderable)
-    where TRenderable : IRenderable
+        where TRenderable : IRenderable
     {
-        var obj = typeof(TRenderable)
-            .GetConstructor(new[] {typeof(int), typeof(int)})?.Invoke(new[]
-            {
-                Settings.Width, (object) Settings.Height
-            });
-        var renderable1 = renderable.DynamicInvoke(obj) as IRenderable;
         items.Add(
-            (renderable1, (x, y) => x.Add(y))
+            (typeof(TRenderable),
+                (x, y) => x.Add(y),
+                renderable)
         );
         return this;
     }
 
 
-    // public ImageBase Multiply<TRenderable>(Func<TRenderable, TRenderable> renderable)
-    // where TRenderable : IRenderable
-    // {
-    //     items.Add(
-    //         (typeof(TRenderable),
-    //             (x, y) => x.Multiply(y),
-    //             renderable)
-    //     );
-    //     return this;
-    // }
+    public ImageBase Multiply<TRenderable>(Func<TRenderable, TRenderable> renderable)
+        where TRenderable : IRenderable
+    {
+        items.Add(
+            (typeof(TRenderable),
+                (x, y) => x.Multiply(y),
+                renderable)
+        );
+        return this;
+    }
 
     public DirectBitmap GetBitmap()
     {
         var baseBitmap = new DirectBitmap(Settings.Width, Settings.Height);
-        foreach (var (renderable, action) in items)
+        if (isFirstTime)
         {
-            renderable.GetBitmap();
-            action(baseBitmap, renderable.GetBitmap());
+            foreach (var (type, action, getter) in items)
+            {
+                var obj = type
+                    .GetConstructor(new[] { typeof(int), typeof(int) })?.Invoke(new[]
+                    {
+                    Settings.Width, (object) Settings.Height
+                    });
+                var renderable = getter.DynamicInvoke(obj) as IRenderable;
+                renderables.Add(renderable);
+                action(baseBitmap, renderable.GetBitmap());
+            }
+
+            isFirstTime = false;
+        }
+        else
+        {
+            for (int i = 0; i < renderables.Count; i++)
+            {
+                var renderable = renderables[i];
+                var action = items[i].action;
+                action(baseBitmap, renderable.GetBitmap());
+            }
         }
 
         return baseBitmap;

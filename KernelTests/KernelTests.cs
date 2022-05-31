@@ -1,19 +1,14 @@
-﻿using FakeItEasy;
-using FluentAssertions;
-using Kernel;
+﻿using Kernel;
 using Kernel.Domain;
 using Kernel.Domain.Settings;
 using Kernel.Domain.Utils;
 using Kernel.Services;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Kernel.Services.Interfaces;
 
 namespace KernelTests
 {
+    [TestFixture]
     public class PlanetsShould
     {
         [Test]
@@ -21,7 +16,7 @@ namespace KernelTests
         {
             var r = A.Fake<Random>();
             A.CallTo(() => r.Next(0, 10)).WithAnyArguments().Returns(5);
-            var planets = new Planets(100, 100).Config(new PlanetsSettings(1, 0, 10, Brushes.White, r));
+            var planets = new Planets(100, 100).Config(new PlanetsSettings(1, 0, 10, r));
             var bmp = planets.GetBitmap();
             bmp.GetPixel(5, 5).Should().Be(Color.FromArgb(255, 255, 255));
             bmp.GetPixel(0, 0).Should().NotBe(Color.FromArgb(255, 255, 255));
@@ -32,7 +27,7 @@ namespace KernelTests
         {
             var r = A.Fake<Random>();
             A.CallTo(() => r.Next(0, 10)).WithAnyArguments().ReturnsNextFromSequence(75, 50, 10, 25, 50, 10);
-            var planets = new Planets(100, 100).Config(new PlanetsSettings(2, 0, 10, Brushes.White, r));
+            var planets = new Planets(100, 100).Config(new PlanetsSettings(2, 0, 10, r));
             var bmp = planets.GetBitmap();
             bmp.GetPixel(79, 50).Should().Be(Color.FromArgb(255, 255, 255));
             bmp.GetPixel(21, 50).Should().Be(Color.FromArgb(255, 255, 255));
@@ -47,18 +42,7 @@ namespace KernelTests
         }
     }
 
-    public class RandomShould
-    {
-        [Test]
-        public void TestRandomInit()
-        {
-            var r = A.Fake<Random>();
-            A.CallTo(() => r.Next(0, 0)).WithAnyArguments().Returns(100);
-            var rand = new RandomG(100, 100).Config(new RandomSettings(0, 0, r));
-            rand.GetBitmap().GetPixel(0, 0).Should().Be(Color.FromArgb(100, 100, 100));
-        }
-    }
-
+    [TestFixture]
     public class ConstantShould
     {
         [Test]
@@ -76,6 +60,7 @@ namespace KernelTests
         }
     }
 
+    [TestFixture]
     public class OperatorsShould
     {
         [Test]
@@ -109,6 +94,7 @@ namespace KernelTests
         }
     }
 
+    [TestFixture]
     public class KernelBuilderTests
     {
         [Test]
@@ -119,6 +105,7 @@ namespace KernelTests
         }
     }
 
+    [TestFixture]
     public class BitmapExtensionsTests
     {
         [Test]
@@ -127,12 +114,13 @@ namespace KernelTests
             var f = new Constant(100, 100).Config(new ConstantSettings(Color.FromArgb(123, 123, 123)));
             f.GetBitmap().Bitmap.SaveJPG100("aboba.jpg");
             var bmp = Bitmap.FromFile("aboba.jpg");
-            ((Bitmap)bmp).GetPixel(0, 0).Should().Be(Color.FromArgb(123, 123, 123));
+            ((Bitmap) bmp).GetPixel(0, 0).Should().Be(Color.FromArgb(123, 123, 123));
             bmp.Dispose();
             File.Delete("aboba.jpg");
         }
     }
 
+    [TestFixture]
     public class BitmapProviderTests
     {
         [Test]
@@ -155,15 +143,32 @@ namespace KernelTests
         }
     }
 
+    [TestFixture]
     public class FunnyTests
     {
         [Test]
         public void TestFunnyEmptyFft()
         {
             var doubles = new double[100];
-            var doublesList = new List<double[]> { doubles };
+            var doublesList = new List<double[]> {doubles};
             var funny = new Funny(100, 100).Config(new FunnySettings(doublesList));
             funny.GetBitmap().GetPixel(0, 0).Should().Be(Color.FromArgb(0, 0, 0, 0));
+        }
+    }
+
+    [TestFixture]
+    public class FFTGeneratorTests
+    {
+        [Test]
+        public void GetFFTShouldUseIWavAudioProvider()
+        {
+            var filename = "aboba.wav";
+            var provider = A.Fake<IWavAudioProvider>();
+            var generator = new FFTGenerator(provider);
+
+            generator.GetFFT(filename);
+
+            A.CallTo(() => provider.ReadWav(filename)).MustHaveHappenedOnceExactly();
         }
     }
 }

@@ -9,15 +9,13 @@ namespace Kernel.Domain
         public readonly int Count;
         public readonly int MinSize;
         public readonly int MaxSize;
-        public readonly Brush Color;
         public readonly Random Random;
 
-        public PlanetsSettings(int count, int minSize, int maxSize, Brush color, Random random)
+        public PlanetsSettings(int count, int minSize, int maxSize, Random random)
         {
             Count = count;
             MinSize = minSize;
             MaxSize = maxSize;
-            Color = color;
             Random = random;
         }
     }
@@ -60,7 +58,7 @@ namespace Kernel.Domain
             var g = Graphics.FromImage(bmp.Bitmap);
             foreach (var planet in PlanetsList)
             {
-                g.FillEllipse(Settings.Color, planet.Position.X - planet.size / 2, planet.Position.Y - planet.size / 2,
+                g.FillEllipse(Brushes.White, planet.Position.X - planet.size / 2, planet.Position.Y - planet.size / 2,
                     planet.size, planet.size);
             }
 
