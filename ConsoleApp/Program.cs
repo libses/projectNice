@@ -19,6 +19,8 @@ namespace VideoGenerator
 
     internal class Program
     {
+        //стирать консоль чтобы стирала
+        //хелп
         static void Main(string[] args)
         {
             Console.WriteLine("На компьютере в папке C:\\ff\\ должен лежать кодек ffmpeg");
@@ -124,9 +126,14 @@ namespace VideoGenerator
 
             for (int i = 0; i < count; i++)
             {
+                if (i % 20 == 0)
+                {
+                    Console.WriteLine(i / (double)count);
+                }
+
                 if (isMandelHere)
                 {
-                    zoom = zoom * 0.99;
+                    zoom = zoom * 0.993;
                     mandel = mandel.Config(new MandelbrotSettings(zoom, mandel.Settings.A, mandel.Settings.B, x, y));
                     mandel.Apply();
                 }
