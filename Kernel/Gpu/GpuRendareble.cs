@@ -21,6 +21,9 @@ public abstract class GpuRenderable<TGpuRen, TSettings> : IGpuRenderable<TGpuRen
     public Action<Index1D, TSettings, ArrayView1D<int, Dense>> Kernel { get; }
 
     private MemoryBuffer1D<int, Dense>? buffer;
+
+    private DirectBitmap bmp;
+
     public Size ImageSize { get; }
 
     public TSettings Settings { get; set; }
@@ -30,7 +33,13 @@ public abstract class GpuRenderable<TGpuRen, TSettings> : IGpuRenderable<TGpuRen
     public DirectBitmap GetBitmap()
     {
         if (buffer is null) Apply();
-        return new DirectBitmap(buffer.GetAsArray1D(), ImageSize.Width, ImageSize.Height);
+        if (bmp is null) bmp = new DirectBitmap(buffer.GetAsArray1D(), ImageSize.Width, ImageSize.Height);
+        else
+        {
+            bmp.Data = buffer.GetAsArray1D();
+        }
+
+        return bmp;
     }
 
     public TGpuRen CopyToBitmap(DirectBitmap bitmap)

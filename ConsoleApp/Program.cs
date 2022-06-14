@@ -19,7 +19,7 @@ namespace VideoGenerator
 
     public class ConsoleF
     {
-        public static string[] Lines = new string[] { "720", "720", "606.mp3", "606.wav", "30", "C:\\videos\\dottrace.mp4", "f", "+", "t", "e" };
+        public static string[] Lines = new string[] { "512", "512", "606.mp3", "606.wav", "1", "C:\\videos\\dottrace.mp4","m", "e" };
         public static int i = -1;
 
         public static void WriteLine(string a)
@@ -62,14 +62,14 @@ namespace VideoGenerator
             Console.WriteLine("и e чтобы закончить ввод");
             Console.WriteLine("");
             Console.WriteLine("параметры: \nf пусто, \nt пусто, \nm пусто, \np количествоПланет минРазмер максРазмер \nc R G B");
-            var fftR = new FFTGenerator(new WavAudioMonoProvider(16000));
-            var fft = fftR.GetFFT(wavname);
+            //var fftR = new FFTGenerator(new WavAudioMonoProvider(16000));
+            //var fft = fftR.GetFFT(wavname);
             var read = ConsoleF.ReadLine();
             var ib = ImageBase.Create().Config(new ImageSettings(x, y));
             //Временный костыль, понял, что нужно сделать. Потом уберу енам.
             var sign = Sign.Add;
             var zoom = 1d;
-            var mandel = new Mandelbrot(x, y).Config(new MandelbrotSettings(zoom, -0.74529, 0.113075, x, y));
+            var mandel = new MandelbrotCPU(x, y).Config(new MandelbrotCPUSettings(zoom, -0.74529, 0.113075, x, y));
             bool isMandelHere = false;
             while (read != "e")
             {
@@ -79,10 +79,10 @@ namespace VideoGenerator
                 {
                     case "f":
                         {
-                            if (sign == Sign.Add)
-                                ib = ib.Add<Funny>(z => new Funny(x, y).Config(new FunnySettings(fft)));
-                            else if (sign == Sign.Multiply)
-                                ib = ib.Multiply<Funny>(z => new Funny(x, y).Config(new FunnySettings(fft)));
+                            //if (sign == Sign.Add)
+                            //    ib = ib.Add<Funny>(z => new Funny(x, y).Config(new FunnySettings(fft)));
+                            //else if (sign == Sign.Multiply)
+                            //    ib = ib.Multiply<Funny>(z => new Funny(x, y).Config(new FunnySettings(fft)));
                             break;
                         }
                     case "c":
@@ -96,19 +96,19 @@ namespace VideoGenerator
                         }
                     case "t":
                         {
-                            if (sign == Sign.Add)
-                                ib = ib.Add<ThreeD>(z => new ThreeD(x, y).Config(new ThreeDSettings(fft)));
-                            else if (sign == Sign.Multiply)
-                                ib = ib.Multiply<ThreeD>(z => new ThreeD(x, y).Config(new ThreeDSettings(fft)));
+                            //if (sign == Sign.Add)
+                            //    ib = ib.Add<ThreeD>(z => new ThreeD(x, y).Config(new ThreeDSettings(fft)));
+                            //else if (sign == Sign.Multiply)
+                            //    ib = ib.Multiply<ThreeD>(z => new ThreeD(x, y).Config(new ThreeDSettings(fft)));
                             break;
                         }
                     case "m":
                         {
                             isMandelHere = true;
                             if (sign == Sign.Add)
-                                ib = ib.Add<Mandelbrot>(x => mandel);
+                                ib = ib.Add<MandelbrotCPU>(x => mandel);
                             else if (sign == Sign.Multiply)
-                                ib = ib.Multiply<Mandelbrot>(x => mandel);
+                                ib = ib.Multiply<MandelbrotCPU>(x => mandel);
                             break;
                         }
                     case "p":
@@ -153,8 +153,7 @@ namespace VideoGenerator
                 if (isMandelHere)
                 {
                     zoom = zoom * 0.993;
-                    mandel = mandel.Config(new MandelbrotSettings(zoom, mandel.Settings.A, mandel.Settings.B, x, y));
-                    mandel.Apply();
+                    mandel = mandel.Config(new MandelbrotCPUSettings(zoom, mandel.Settings.A, mandel.Settings.B, x, y));
                 }
 
                 var bitmap = ib.GetBitmap();
@@ -162,9 +161,9 @@ namespace VideoGenerator
                 //bitmap.Dispose();
             }
 
-            var vc = new VideoCreator(new VideoEncoderSettings(x, y, 44, VideoCodec.H265));
-            var prov = new BitmapProvider("temp", "jpg", count);
-            vc.CreateWithSound(prov.Get(), path, mp3name);
+            //var vc = new VideoCreator(new VideoEncoderSettings(x, y, 44, VideoCodec.H265));
+            //var prov = new BitmapProvider("temp", "jpg", count);
+            //vc.CreateWithSound(prov.Get(), path, mp3name);
         }
     }
 }

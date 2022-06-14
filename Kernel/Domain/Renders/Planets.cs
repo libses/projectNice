@@ -31,14 +31,20 @@ namespace Kernel.Domain
         float sumMass;
         float xMass;
         float yMass;
+        private DirectBitmap bmp;
 
         public Planets(int width, int height) : base(width, height)
         {
+            bmp = new DirectBitmap(width, height);
         }
 
         public override DirectBitmap GetBitmap()
         {
-            var bmp = new DirectBitmap(Width, Height);
+            for (int i = 0; i < bmp.Data.Length; i++)
+            {
+                bmp.Data[i] = 0;
+            }
+
             if (PlanetsList.Count == 0)
             {
                 var r = Settings.Random;
