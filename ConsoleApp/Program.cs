@@ -17,6 +17,24 @@ namespace VideoGenerator
         Multiply
     }
 
+    public class ConsoleF
+    {
+        public static string[] Lines = new string[] { "720", "720", "606.mp3", "606.wav", "30", "C:\\videos\\dottrace.mp4", "f", "+", "t", "e" };
+        public static int i = -1;
+
+        public static void WriteLine(string a)
+        {
+
+        }
+
+        public static string ReadLine()
+        {
+            i++;
+            Console.WriteLine(Lines[i]);
+            return Lines[i];
+        }
+    }
+
     internal class Program
     {
         //стирать консоль чтобы стирала
@@ -25,27 +43,28 @@ namespace VideoGenerator
         {
             Console.WriteLine("На компьютере в папке C:\\ff\\ должен лежать кодек ffmpeg");
             Console.WriteLine("Укажите разрешение по горизонтали");
-            var x = int.Parse(Console.ReadLine());
+            var x = int.Parse(ConsoleF.ReadLine());
             Console.WriteLine("Укажите разрешение по вертикали");
-            var y = int.Parse(Console.ReadLine());
+            var y = int.Parse(ConsoleF.ReadLine());
             Console.WriteLine("Укажите имя входного mp3 файла");
-            var mp3name = Console.ReadLine();
+            var mp3name = ConsoleF.ReadLine();
             Console.WriteLine("Укажите имя входного wav файла");
-            var wavname = Console.ReadLine();
-            Console.WriteLine("Укажите количество кадров генерации");
-            var count = int.Parse(Console.ReadLine());
+            var wavname = ConsoleF.ReadLine();
+            Console.WriteLine("Укажите количество секунд генерации");
+            var seconds = int.Parse(ConsoleF.ReadLine());
+            var count = seconds * 44;
             Console.WriteLine("Укажите путь до выходного файла (example.mp4)");
-            var path = Console.ReadLine();
+            var path = ConsoleF.ReadLine();
             Console.WriteLine("Генерации на выбор: f, t, m, p, c");
             Console.WriteLine("Чтобы сгенерировать что-либо введите формулу генерации");
             Console.WriteLine("Построчно вводите добавляемые алгоритмы генерации и их сочетание");
             Console.WriteLine("Например \nf\n+\nc 210 200 100");
             Console.WriteLine("и e чтобы закончить ввод");
-            Console.WriteLine();
+            Console.WriteLine("");
             Console.WriteLine("параметры: \nf пусто, \nt пусто, \nm пусто, \np количествоПланет минРазмер максРазмер \nc R G B");
             var fftR = new FFTGenerator(new WavAudioMonoProvider(16000));
             var fft = fftR.GetFFT(wavname);
-            var read = Console.ReadLine();
+            var read = ConsoleF.ReadLine();
             var ib = ImageBase.Create().Config(new ImageSettings(x, y));
             //Временный костыль, понял, что нужно сделать. Потом уберу енам.
             var sign = Sign.Add;
@@ -113,7 +132,7 @@ namespace VideoGenerator
                         }
                 }
 
-                read = Console.ReadLine();
+                read = ConsoleF.ReadLine();
             }
             var kernel = KernelBuilder.Create();
             kernel.ConfigureFFTGenerator(16000);
@@ -138,7 +157,9 @@ namespace VideoGenerator
                     mandel.Apply();
                 }
 
-                ib.GetBitmap().Bitmap.SaveJPG100("temp/" + i + ".jpg");
+                var bitmap = ib.GetBitmap();
+                bitmap.Bitmap.SaveJPG100("temp/" + i + ".jpg");
+                //bitmap.Dispose();
             }
 
             var vc = new VideoCreator(new VideoEncoderSettings(x, y, 44, VideoCodec.H265));

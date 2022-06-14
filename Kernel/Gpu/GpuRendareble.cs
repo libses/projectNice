@@ -79,4 +79,9 @@ public abstract class GpuRenderable<TGpuRen, TSettings> : IGpuRenderable<TGpuRen
     {
         buffer?.Dispose();
     }
+
+    public DirectBitmap Update(DirectBitmap bitmap)
+    {
+        throw new NotImplementedException();
+    }
 }

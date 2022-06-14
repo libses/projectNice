@@ -136,7 +136,7 @@ namespace KernelTests
             bmps.Count.Should().Be(2);
             bmps[0].GetPixel(0, 0).Should().Be(bmp.GetPixel(0, 0));
             bmp.Dispose();
-            provider.Dispose();
+            //provider.Dispose();
             File.Delete("temp\\0.jpg");
             File.Delete("temp\\1.jpg");
             Directory.Delete("temp");

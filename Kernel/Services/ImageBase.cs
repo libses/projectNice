@@ -1,6 +1,7 @@
 using Kernel.Domain.Interfaces;
 using Kernel.Domain.Settings;
 using Kernel.Domain.Utils;
+using System.Drawing;
 
 namespace Kernel.Services;
 
@@ -9,6 +10,7 @@ public class ImageBase : Configurer<ImageSettings>
     private readonly List<(Type type, Action<DirectBitmap, DirectBitmap> action, Delegate getter)> items;
     private bool isFirstTime = true;
     private readonly List<IRenderable> renderables = new List<IRenderable>();
+    private DirectBitmap baseBitmap;
 
     private ImageBase()
     {
@@ -49,9 +51,9 @@ public class ImageBase : Configurer<ImageSettings>
 
     public DirectBitmap GetBitmap()
     {
-        var baseBitmap = new DirectBitmap(Settings.Width, Settings.Height);
         if (isFirstTime)
         {
+            baseBitmap = new DirectBitmap(Settings.Width, Settings.Height);
             foreach (var (type, action, getter) in items)
             {
                 var obj = type
@@ -61,18 +63,25 @@ public class ImageBase : Configurer<ImageSettings>
                     });
                 var renderable = getter.DynamicInvoke(obj) as IRenderable;
                 renderables.Add(renderable);
-                action(baseBitmap, renderable.GetBitmap());
+                var second = renderable.GetBitmap();
+                action(baseBitmap, second);
             }
 
             isFirstTime = false;
         }
         else
         {
+            for (var i = 0; i < baseBitmap.Data.Length; i++)
+            {
+                baseBitmap.Data[i] = 0;
+            }
+
             for (int i = 0; i < renderables.Count; i++)
             {
                 var renderable = renderables[i];
                 var action = items[i].action;
-                action(baseBitmap, renderable.GetBitmap());
+                var second = renderable.GetBitmap();
+                action(baseBitmap, second);
             }
         }
 
